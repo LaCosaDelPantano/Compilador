@@ -24,7 +24,7 @@ typedef enum {//Identifica el tipo de numero
     TYPE_UNKNOWN
 } DataType;
 
-typedef struct Symbol {
+typedef struct Symbol {//Crea una variable para el tipo de dato guardado
     char name[100];
     DataType type;
     struct Symbol* next;
