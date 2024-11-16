@@ -18,7 +18,7 @@ typedef struct {
     char value[100];
 } Token;
 
-typedef enum {
+typedef enum {//Identifica el tipo de numero
     TYPE_INT,
     TYPE_FLOAT,
     TYPE_UNKNOWN
