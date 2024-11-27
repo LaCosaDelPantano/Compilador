@@ -1,79 +1,60 @@
 #include <iostream>
-#include <string>
-
 using namespace std;
-bool verif;
 
-struct Nodito // Se define un struct que crea un tipo de dato "Nodito"
-{
-    int valor;          // Valor almacenado en el nodo
-    Nodito* izquierdo;  // Apuntador al subárbol izquierdo
-    Nodito* derecho;    // Apuntador al subárbol derecho
+struct Nodito {
+    int valor;
+    Nodito* izquierdo = nullptr;
+    Nodito* derecho = nullptr;
 };
 
-Nodito* crearNodo(int valor) // Función para crear un nuevo nodo
-{
-    Nodito* nuevo = new Nodito();
-    nuevo->valor = valor;
-    nuevo->izquierdo = nullptr;
-    nuevo->derecho = nullptr;
-    return nuevo;
+Nodito* crearNodo(int valor) { return new Nodito{valor}; }
+
+Nodito* recorrer(Nodito* raiz, int valor) {
+    if (!raiz || raiz->valor == valor) return raiz;
+    return valor < raiz->valor ? (raiz->izquierdo ? recorrer(raiz->izquierdo, valor) : raiz)
+                               : (raiz->derecho ? recorrer(raiz->derecho, valor) : raiz);
 }
 
-Nodito* recorrer(Nodito* raiz, int valor) // Función para localizar la posición de inserción
-{
-    if (raiz->valor == valor) // Si se encuentra el nodo o se llega a un nodo nulo
-        verif=true;
-    if (valor < raiz->valor) // Si el valor es menor, busca en el subárbol izquierdo
-    {
-        if (raiz->izquierdo == nullptr) // Si el subárbol izquierdo está vacío, retorna la raíz actual
-            return raiz;
-        return recorrer(raiz->izquierdo, valor); // Continúa recorriendo
+Nodito* insertar(Nodito* raiz, int valor) {
+    if (!raiz) return crearNodo(valor);
+    Nodito* pos = recorrer(raiz, valor);
+    if (valor < pos->valor) pos->izquierdo = crearNodo(valor);
+    else pos->derecho = crearNodo(valor);
+    return raiz;
+}
+
+Nodito* encontrarMinimo(Nodito* raiz) {
+    while (raiz && raiz->izquierdo) raiz = raiz->izquierdo;
+    return raiz;
+}
+
+Nodito* eliminacion(Nodito* raiz, int valor) {
+    if (!raiz) return nullptr;
+    if (valor < raiz->valor) raiz->izquierdo = eliminacion(raiz->izquierdo, valor);
+    else if (valor > raiz->valor) raiz->derecho = eliminacion(raiz->derecho, valor);
+    else {
+        if (!raiz->izquierdo || !raiz->derecho) {
+            Nodito* temp = raiz->izquierdo ? raiz->izquierdo : raiz->derecho;
+            delete raiz;
+            return temp;
+        }
+        Nodito* sucesor = encontrarMinimo(raiz->derecho);
+        raiz->valor = sucesor->valor;
+        raiz->derecho = eliminacion(raiz->derecho, sucesor->valor);
     }
-    else // Si el valor es mayor o igual, busca en el subárbol derecho
-    {
-        if (raiz->derecho == nullptr) // Si el subárbol derecho está vacío, retorna la raíz actual
-            return raiz;
-        return recorrer(raiz->derecho, valor); // Continúa recorriendo
-    }
+    return raiz;
 }
 
-Nodito* insertar(Nodito* raiz, int valor) // Función para insertar un valor en el árbol binario
-{
-    if (raiz == nullptr) // Si el árbol está vacío, crea un nuevo nodo como raíz
-        return crearNodo(valor);
-
-    Nodito* posicion = recorrer(raiz, valor); // Encuentra la posición donde insertar el nuevo nodo
-
-    if (valor < posicion->valor) // Si el valor es menor, se inserta a la izquierda
-        posicion->izquierdo = crearNodo(valor);
-    else // Si el valor es mayor o igual, se inserta a la derecha
-        posicion->derecho = crearNodo(valor);
-    return raiz; // Retorna la raíz del árbol
+void recorridoInorden(Nodito* raiz) {
+    if (!raiz) return;
+    recorridoInorden(raiz->izquierdo);
+    cout << raiz->valor << " ";
+    recorridoInorden(raiz->derecho);
 }
 
-bool buscar(Nodito* raiz, int valor) 
- {
-    if (raiz==NULL)
-	  {
-        return false; // Si el arbol esta vacio o se llega a un nodo nulo
-      }
-    recorrer(raiz, valor);
-    return verif;
- }
+bool buscar(Nodito* raiz, int valor) { return recorrer(raiz, valor) != nullptr; }
 
-void recorridoInorden(Nodito* raiz) // funcion para mostrar el arbol en orden (inorden)
-  {
-    if(raiz!=NULL) 
-	 {
-        recorridoInorden(raiz->izquierdo);    // Recorrer subarbol izquierdo
-        cout<<raiz->valor<<" ";              // Se muestran los valor de la raíz
-        recorridoInorden(raiz->derecho);    // Se recorre el subarbol derecho
-     }
-  }
-
-int main() 
-{
+int main() {
     system("color f0");   //Funcion para cambiar el fondo y color 
     Nodito* raiz = NULL; // Inicializar un arbol que esta vacio
     int opcion, valor;
@@ -82,52 +63,35 @@ int main()
     cout<<"\t\t\t\t\t\t  GRUPO: 5CM23"<<endl;
     cout<<"\t\t\t\t\t     Analisis de Algoritmos\n"<<endl;
     cout<<"------------------------------------------------------------------------------------------------------------------------"<<endl;
-    do{   //Se usa un do-while, para que se pueda regresar al menu las veces que el usuario quiera 
-        cout<<"1. Insertar un valor\n";   //Menu de operaciones basicas con arboles de busqueda binarios
-        cout<<"2. Busqueda de un valor\n";
-        cout<<"3. Eliminacion de un valor\n";
-        cout<<"4. Mostrar recorrido inorden\n";
-        cout<<"0. Salir\n";
-        cout<<"Selecciona una opcion: ";   //Se ingresa el valor de la opcion
-        cin>>opcion;
-        switch (opcion) //Inicio del switch y declaracion de los casos
-		{
+    Nodito* raiz = nullptr;
+    int opcion, valor;
+    do {
+        cout << "\n1. Insertar valor\n2. Buscar valor\n3. Eliminar valor\n4. Mostrar inorden\n0. Salir\nSelecciona: ";
+        cin >> opcion;
+        switch (opcion) {
             case 1:
-                cout<<"Ingresa un dato a insertar: ";
-                cin>>valor;
-                raiz=insertar(raiz, valor); // Insertar el valor dado por el usuario en la raiz
-                cout<<"Se inserto el dato correctamente.\n";
-            break;
-                
+                cout << "Dato a insertar: "; cin >> valor;
+                raiz = insertar(raiz, valor);
+                cout << "Dato insertado.\n";
+                break;
             case 2:
-            	cout<<"Ingresa el dato a buscar: ";
-                cin>>valor;
-                  if(buscar(raiz, valor))
-                    cout<<"El dato "<<valor<<" SI se encuentra en el arbol.\n";
-                  else
-                    cout<<"El dato "<<valor<<" NO se encuentra en el arbol.\n";
-            break;
-            
+                cout << "Dato a buscar: "; cin >> valor;
+                cout << "El dato " << valor << (buscar(raiz, valor) ? " SI " : " NO ") << "se encuentra en el árbol.\n";
+                break;
             case 3:
-                cout<<"Ingresa el valor a eliminar: ";
-                cin>>valor;
-                //raiz=eliminacion(raiz, valor);
-            break;
-            
+                cout << "Dato a eliminar: "; cin >> valor;
+                raiz = eliminacion(raiz, valor);
+                cout << "Dato eliminado.\n";
+                break;
             case 4:
-                cout<<"Recorrido inorden: ";
-                recorridoInorden(raiz); // Mostrar el arbol en inorden
-                cout<<endl;
-            break;
-            
+                cout << "Recorrido inorden: "; recorridoInorden(raiz); cout << endl;
+                break;
             case 0:
-                cout<<"PULSA ENTER PARA FINALIZAR\n";
-            break;
-            
+                cout << "Saliendo...\n";
+                break;
             default:
-                cout<<"No seleccionaste una opcion valida.";
+                cout << "Opción no válida.\n";
         }
-    } 
-while(opcion!=0);
-return 0;
+    } while (opcion != 0);
+    return 0;
 }
