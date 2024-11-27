@@ -13,7 +13,7 @@ typedef enum {
     TOKEN_UNKNOWN
 } TokenType;
 
-typedef struct {
+typedef struct {//Define la longitud y tipo de token
     TokenType tipo;
     char value[100];
 } Token;
@@ -260,7 +260,7 @@ void parse_expression(const char* input, int* pos) {
         exit(1);
     }
 
-    size_t i;
+    size_t i;//evita perder los tokens
     for (i = 0; i < sizeof(auxiliary) - 1 && token.value[i] != '\0'; i++) {
         auxiliary[i] = token.value[i];
     }
