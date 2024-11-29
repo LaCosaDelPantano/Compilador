@@ -13,18 +13,18 @@ typedef enum {
     TOKEN_UNKNOWN
 } TokenType;
 
-typedef struct {
+typedef struct {//Define la longitud y tipo de token
     TokenType tipo;
     char value[100];
 } Token;
 
-typedef enum {
+typedef enum {//Identifica el tipo de numero
     TYPE_INT,
     TYPE_FLOAT,
     TYPE_UNKNOWN
 } DataType;
 
-typedef struct Symbol {
+typedef struct Symbol {//Crea una variable para el tipo de dato guardado
     char name[100];
     DataType type;
     struct Symbol* next;
@@ -260,7 +260,7 @@ void parse_expression(const char* input, int* pos) {
         exit(1);
     }
 
-    size_t i;
+    size_t i;//evita perder los tokens
     for (i = 0; i < sizeof(auxiliary) - 1 && token.value[i] != '\0'; i++) {
         auxiliary[i] = token.value[i];
     }
