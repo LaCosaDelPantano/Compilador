@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Depuración C++",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/a.exe", // Cambia según tu sistema operativo
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Habilitar impresión de símbolos",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Compilar"
+        }
+    ]
+}
