@@ -1,4 +1,47 @@
 Breve historia del tiempo,Stephen Hawking,4,1988,4,1
 It,Stephen King,2,1986,9,15
-El ladron del rayo,Rick Riordan,1,2005,6,28
-El mar de los mounstruos,Rick Riordan,1,2006,4,1
+El ladrón del rayo,Rick Riordan,1,2005,6,28
+El mar de los monstruos,Rick Riordan,1,2006,4,1
+Harry Potter y la piedra filosofal,J.K. Rowling,1,1997,6,26
+Harry Potter y la cámara secreta,J.K. Rowling,1,1998,7,2
+Cien años de soledad,Gabriel García Márquez,5,1967,5,30
+El amor en los tiempos del cólera,Gabriel García Márquez,1,1985,9,15
+1984,George Orwell,1,1949,6,8
+Rebelión en la granja,George Orwell,1,1945,8,17
+El señor de los anillos: La comunidad del anillo,J.R.R. Tolkien,1,1954,7,29
+El hobbit,J.R.R. Tolkien,3,1937,9,21
+Juego de tronos,George R.R. Martin,1,1996,8,6
+Choque de reyes,George R.R. Martin,1,1998,11,16
+Tormenta de espadas,George R.R. Martin,1,2000,8,8
+Danza de dragones,George R.R. Martin,1,2011,7,12
+Los pilares de la tierra,Ken Follett,2,1989,9,18
+Un mundo sin fin,Ken Follett,1,2007,10,9
+La sombra del viento,Carlos Ruiz Zafón,1,2001,4,17
+El juego del ángel,Carlos Ruiz Zafón,1,2008,4,17
+Don Quijote de la Mancha,Miguel de Cervantes,1,1605,1,16
+Crimen y castigo,Fiódor Dostoyevski,1,1866,11,1
+Anna Karenina,León Tolstói,1,1877,12,1
+Guerra y paz,León Tolstói,3,1869,1,1
+Los miserables,Victor Hugo,2,1862,3,30
+El nombre de la rosa,Umberto Eco,1,1980,6,9
+El principito,Antoine de Saint-Exupéry,1,1943,4,6
+Drácula,Bram Stoker,5,1897,5,26
+Frankenstein,Mary Shelley,3,1818,1,1
+La isla del tesoro,Robert Louis Stevenson,1,1883,11,14
+Moby Dick,Herman Melville,4,1851,10,18
+El retrato de Dorian Gray,Oscar Wilde,1,1890,7,20
+Alicia en el país de las maravillas,Lewis Carroll,1,1865,7,4
+Las aventuras de Tom Sawyer,Mark Twain,3,1876,6,30
+Los juegos del hambre,Suzanne Collins,1,2008,9,14
+En llamas,Suzanne Collins,1,2009,9,1
+Sinsajo,Suzanne Collins,1,2010,8,24
+Divergente,Veronica Roth,1,2011,4,25
+Insurgente,Veronica Roth,1,2012,5,1
+Leal,Veronica Roth,1,2013,10,22
+El código Da Vinci,Dan Brown,1,2003,3,18
+Ángeles y demonios,Dan Brown,1,2000,5,16
+Inferno,Dan Brown,1,2013,5,14
+La chica del tren,Paula Hawkins,1,2015,1,13
+Perdida,Gillian Flynn,1,2012,6,5
+La casa de los espíritus,Isabel Allende,1,1982,10,30
+El diario de Ana Frank,Ana Frank,1,1947,6,25

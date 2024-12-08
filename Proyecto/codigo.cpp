@@ -58,6 +58,52 @@ Autor* CrearAutor(const char* nombreAutor) {
     return nuevoAutor;
 }
 
+void OrdenarAutoresPorNombre() {
+    if (listaAutor == nullptr || listaAutor->siguiente == nullptr) {
+        // Si la lista está vacía o tiene un solo elemento, no hay nada que ordenar.
+        return;
+    }
+
+    bool intercambio;
+    do {
+        intercambio = false;
+        Autor* actual = listaAutor;
+        Autor* anterior = nullptr;
+
+        while (actual != nullptr && actual->siguiente != nullptr) {
+            Autor* siguiente = actual->siguiente;
+
+            // Comparar los nombres de los autores
+            if (strcmp(actual->autor, siguiente->autor) > 0) {
+                // Intercambiar nodos
+                if (anterior == nullptr) {
+                    // Cambiar el inicio de la lista
+                    listaAutor = siguiente;
+                } else {
+                    anterior->siguiente = siguiente;
+                }
+
+                actual->siguiente = siguiente->siguiente;
+                siguiente->siguiente = actual;
+
+                // Marcar que hubo un intercambio
+                intercambio = true;
+            }
+
+            // Mover los punteros
+            anterior = (anterior == nullptr) ? listaAutor : anterior->siguiente;
+            actual = anterior->siguiente;
+        }
+    } while (intercambio);
+    Autor* actual = listaAutor;
+    int cont=1;
+    while(actual!=nullptr){
+        actual->digito=cont;
+        actual=actual->siguiente;
+        cont++;
+    }
+}
+
 Autor*  buscar(const char* nombreAutor){
     Autor* temp = listaAutor;
     while (temp != nullptr){
@@ -758,6 +804,7 @@ void menu() {
 
 int main() {
     traer_libros();
+    OrdenarAutoresPorNombre();
     menu();
     return 0;
 };
