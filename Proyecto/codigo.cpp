@@ -312,20 +312,20 @@ void borrarLibro(Libro* libro, Autor* autor) {
     fs.close();
     remove("Libros.txt");
     rename("TempLibros.txt","Libros.txt");
-    Libro* aux= libro->anterior;
-    if(libro->siguiente!=nullptr){
-        libro->siguiente->dig=libro->dig;
-        aux->siguiente=libro->siguiente;
-        libro->siguiente->anterior=aux;
-        delete libro;
-        while(aux->siguiente!=nullptr){
-            aux->siguiente->dig=aux->dig+1;
-            aux=aux->siguiente;
-        }
-    }else{
-        aux->siguiente=nullptr;
+    Libro* aux = libro->anterior;
+    if (libro->siguiente != nullptr) {
+        libro->siguiente->anterior = libro->anterior;
     }
-    cout<<"Libro eliminado correctamente\n";
+    if (libro->anterior != nullptr) {
+        libro->anterior->siguiente = libro->siguiente;
+    }
+    
+    // Actualizar puntero seleccionado si es necesario
+    Libro* siguienteLibro = libro->siguiente != nullptr ? libro->siguiente : libro->anterior;
+
+    delete libro;
+    libro = siguienteLibro; // Actualizar el puntero externo para reflejar cambios
+    cout << "Libro eliminado correctamente.\n";
 }
 
 void cambiar_autor(const char* nuevoAutorNombre, Libro* libroMover) {
