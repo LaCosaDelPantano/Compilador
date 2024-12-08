@@ -1,11 +1,13 @@
 #include <iostream>
-#include <cstring>
 #include <fstream>
+#include <string>
+#include <cstring>
+#include <cctype> // Para isdigit
 
 using namespace std;
 
 typedef enum {
-    CIENCIA_FICCION,
+    CIENCIA_FICCION=1,
     HORROR,
     ROMANCE,
     CIENCIA,
@@ -83,13 +85,57 @@ void agregarLibro(Libro* nuevo, Autor* autor) {
     }
 }
 
-// Función para crear un nuevo libro
-Libro* crearLibro(Genero tipo, const char* autor, const char* titulo, int ano, int mes, int dia) {
-    Autor* modificar = buscar(autor);
-    if (modificar == nullptr) {
-        modificar = CrearAutor(autor); // Actualizamos correctamente la variable
+bool verificar_libros(const char* autor, const char* libro) {
+    string linea;
+    char libroBus[50] = "", autorBus[50] = "";
+
+    ifstream fs("Libros.txt");
+    if (!fs.is_open()) {
+        cerr << "No se pudo abrir el archivo.\n";
+        return true; // Si no existe el archivo, lo consideramos como no encontrado
     }
 
+    while (getline(fs, linea)) {
+        int i = 0, j = 0;
+        // Leer título del libro
+        for (; i < linea.length() && linea[i] != ','; i++) {
+            libroBus[j++] = linea[i];
+        }
+        libroBus[j] = '\0';
+        i++; j = 0;
+
+        // Leer autor
+        for (; i < linea.length() && linea[i] != ','; i++) {
+            autorBus[j++] = linea[i];
+        }
+        autorBus[j] = '\0';
+
+        // Verificar coincidencia
+        if (strcmp(libroBus, libro) == 0 && strcmp(autorBus, autor) == 0) {
+            fs.close();
+            return false; // El libro ya existe con ese autor
+        }
+    }
+
+    fs.close();
+    return true; // El libro no existe con ese autor
+}
+
+// Función para crear un nuevo libro
+Libro* crearLibro(Genero tipo, const char* autor, const char* titulo, int ano, int mes, int dia) {
+    // Verificar si el libro ya existe en el archivo
+    if (!verificar_libros(autor, titulo)) {
+        cout << "El libro con ese título y autor ya existe en el archivo.\n";
+        return nullptr;
+    }
+
+    // Buscar o crear el autor
+    Autor* modificar = buscar(autor);
+    if (modificar == nullptr) {
+        modificar = CrearAutor(autor);
+    }
+
+    // Crear el libro
     Libro* nuevoLibro = new Libro();
     nuevoLibro->tipo = tipo;
     strncpy(nuevoLibro->titulo, titulo, sizeof(nuevoLibro->titulo) - 1);
@@ -100,8 +146,117 @@ Libro* crearLibro(Genero tipo, const char* autor, const char* titulo, int ano, i
     nuevoLibro->siguiente = nullptr;
     nuevoLibro->anterior = nullptr;
 
+    // Escribir el nuevo libro en el archivo
+    ofstream fs("Libros.txt", ios::app); // Abrir en modo de anexar
+    if (!fs.is_open()) {
+        cerr << "No se pudo abrir el archivo para escritura.\n";
+        delete nuevoLibro;
+        return nullptr;
+    }
+    fs << titulo << "," << autor << "," << tipo << "," << ano << "," << mes << "," << dia << "\n";
+    fs.close();
+
+    // Agregar el libro a la lista del autor
     agregarLibro(nuevoLibro, modificar);
+
+    cout << "Libro creado y agregado exitosamente.\n";
     return nuevoLibro;
+}
+
+void traer_libros() {
+    string linea;
+    char libro[50] = "", autor[50] = "", tipoStr[2] = "", anoStr[5] = "", mesStr[3] = "", diaStr[3] = "";
+    Genero tipo;
+    int ano, mes, dia, aux;
+    ifstream fs("Libros.txt");
+
+    if (!fs.is_open()) {
+        cerr << "No se pudo abrir el archivo.\n";
+        return;
+    }
+
+    while (getline(fs, linea)) {
+        int i = 0, j = 0;
+
+        // Leer título del libro
+        for (; i < linea.length() && linea[i] != ','; i++) {
+            libro[j++] = linea[i];
+        }
+        libro[j] = '\0';
+        i++; j = 0;
+
+        // Leer autor
+        for (; i < linea.length() && linea[i] != ','; i++) {
+            autor[j++] = linea[i];
+        }
+        autor[j] = '\0';
+        i++; j = 0;
+
+        // Leer tipo (género)
+        for (; i < linea.length() && linea[i] != ','; i++) {
+            tipoStr[j++] = linea[i];
+        }
+        tipoStr[j] = '\0';
+        aux = atoi(tipoStr); // Convertir el tipo a entero
+        i++; j = 0;
+
+        // Leer año
+        for (; i < linea.length() && linea[i] != ','; i++) {
+            anoStr[j++] = linea[i];
+        }
+        anoStr[j] = '\0';
+        ano = atoi(anoStr); // Convertir el año a entero
+        i++; j = 0;
+
+        // Leer mes
+        for (; i < linea.length() && linea[i] != ','; i++) {
+            mesStr[j++] = linea[i];
+        }
+        mesStr[j] = '\0';
+        mes = atoi(mesStr); // Convertir el mes a entero
+        i++; j = 0;
+
+        // Leer día
+        for (; i < linea.length() && linea[i] != ','; i++) {
+            diaStr[j++] = linea[i];
+        }
+        diaStr[j] = '\0';
+        dia = atoi(diaStr); // Convertir el día a entero
+
+        // Convertir aux en el tipo de género
+        switch (aux) {
+            case 1: tipo = CIENCIA_FICCION; break;
+            case 2: tipo = HORROR; break;
+            case 3: tipo = ROMANCE; break;
+            case 4: tipo = CIENCIA; break;
+            case 5: tipo = AVENTURA; break;
+            default:
+                cerr << "Género desconocido para el libro: " << libro << "\n";
+                continue; // Pasar al siguiente libro
+        }
+
+        // Buscar o crear el autor
+        Autor* modificar = buscar(autor);
+        if (modificar == nullptr) {
+            modificar = CrearAutor(autor);
+        }
+
+        // Crear el libro en memoria y agregarlo al autor
+        Libro* nuevoLibro = new Libro();
+        nuevoLibro->tipo = tipo;
+        strncpy(nuevoLibro->titulo, libro, sizeof(nuevoLibro->titulo) - 1);
+        nuevoLibro->titulo[sizeof(nuevoLibro->titulo) - 1] = '\0';
+        nuevoLibro->ano = ano;
+        nuevoLibro->mes = mes;
+        nuevoLibro->dia = dia;
+        nuevoLibro->siguiente = nullptr;
+        nuevoLibro->anterior = nullptr;
+
+        agregarLibro(nuevoLibro, modificar);
+    }
+
+    fs.close();
+    cout << "Libros cargados exitosamente.\n";
 }
 
 Autor* bus_aut(int a) {
@@ -126,15 +281,51 @@ Libro* bus_lib(int a, Libro* buscar) {
 }
 
 void borrarLibro(Libro* libro, Autor* autor) {
-    Libro* aux= libro->anterior;
-    libro->siguiente->dig=libro->dig;
-    aux->siguiente=libro->siguiente;
-    delete libro;
-    while(aux->siguiente!=nullptr){
-        aux->siguiente->dig=aux->dig+1;
-        aux=aux->siguiente;
+
+    // Actualizar el archivo
+    ifstream fs("Libros.txt");
+    string linea;
+    ofstream temporal("TempLibros.txt");
+
+    while (getline(fs, linea)) {
+        char libroBus[50] = "", autorBus[50] = "";
+        int i = 0, j = 0;
+        // Leer título del libro
+        for (; i < linea.length() && linea[i] != ','; i++) {
+            libroBus[j++] = linea[i];
+        }
+        libroBus[j] = '\0';
+        i++; j = 0;
+
+        // Leer autor
+        for (; i < linea.length() && linea[i] != ','; i++) {
+            autorBus[j++] = linea[i];
+        }
+        autorBus[j] = '\0';
+
+        // Verificar coincidencia
+        if (strcmp(libroBus, libro->titulo) != 0 || strcmp(autorBus, autor->autor) != 0) {
+            temporal<<linea<<"\n";
+        }
     }
-    return;
+    temporal.close();
+    fs.close();
+    remove("Libros.txt");
+    rename("TempLibros.txt","Libros.txt");
+    Libro* aux= libro->anterior;
+    if(libro->siguiente!=nullptr){
+        libro->siguiente->dig=libro->dig;
+        aux->siguiente=libro->siguiente;
+        libro->siguiente->anterior=aux;
+        delete libro;
+        while(aux->siguiente!=nullptr){
+            aux->siguiente->dig=aux->dig+1;
+            aux=aux->siguiente;
+        }
+    }else{
+        aux->siguiente=nullptr;
+    }
+    cout<<"Libro eliminado correctamente\n";
 }
 
 void cambiar_autor(const char* nuevoAutorNombre, Libro* libroMover) {
@@ -309,6 +500,7 @@ void imprimir_lib_aut(Libro* seleccionado, const char* autor) {
 
     int sel;
     do {
+        seleccionado=seleccionado->siguiente;
         cout << "------------- " << autor << " -------------\n";
         cout << "0. Regresar\n";
 
@@ -331,9 +523,7 @@ void imprimir_lib_aut(Libro* seleccionado, const char* autor) {
         Libro* libroSeleccionado = bus_lib(sel, seleccionado);
         if (libroSeleccionado != nullptr) {
             int resultado = imprimir_libro(libroSeleccionado, autor);
-            if (resultado == 0) {
-                continue; // Regresar al menú de libros
-            }
+            return;
         } else {
             cout << "Número no válido. Intenta de nuevo.\n";
         }
@@ -363,7 +553,7 @@ void imprimir_autores() {
         // Buscar el autor seleccionado
         imprimir = bus_aut(sel);
         if (imprimir != nullptr) {
-            imprimir_lib_aut(imprimir->primer_Lib->siguiente, imprimir->autor);
+            imprimir_lib_aut(imprimir->primer_Lib, imprimir->autor);
         } else {
             cout << "Número no válido. Intenta de nuevo.\n";
         }
@@ -492,10 +682,53 @@ void por_Crit() {
     }
 };
 
+void agregar(){
+    Genero tipo;
+    char titulo[100], autor[50];
+    int ano, mes, dia;
+    cout << "Escribe el título: ";
+    cin.ignore(); // Limpiar el buffer
+    cin.getline(titulo, sizeof(titulo));
+    cout << "Escribe el autor: ";
+    cin.getline(autor, sizeof(autor));
+    cout<<autor<<endl;
+    Autor* Comparar=buscar_por_lib(titulo);
+    if(Comparar->autor==autor){
+        cout<<"El libro con ese autor ya existe";
+        return;
+    }
+    cout<<"Selecciona el genero\n";
+    int sel;
+    cout << "Géneros disponibles:\n";
+    cout << "1. CIENCIA_FICCION\n2. HORROR\n3. ROMANCE\n4. CIENCIA\n5. AVENTURA\n";
+    cout << "Elige un género: ";
+    cin >> sel;
+
+    while (sel < 1 || sel > 5) {
+        cout << "Opción no válida. Intenta de nuevo.\n";
+        cin>>sel;
+    }
+    switch (sel) {
+    case 1: tipo = CIENCIA_FICCION; break;
+    case 2: tipo = HORROR; break;
+    case 3: tipo = ROMANCE; break;
+    case 4: tipo = CIENCIA; break;
+    case 5: tipo = AVENTURA; break;
+    }
+    cout << "Escribe la fecha.\n";
+    cout << "Año: ";
+    cin >> ano;
+    cout << "Mes (1-12): ";
+    cin >> mes;
+    cout << "Día (1-31): ";
+    cin >> dia;
+    crearLibro(tipo,autor,titulo,ano,mes,dia);
+}
+
 void menu() {
     while (true) { // Bucle principal del menú
         cout << "------------- Menú Principal -------------" << endl;
-        cout << "0. Salir\n1. Buscar por criterio\n2. Lista de Autores\n";
+        cout << "0. Salir\n1. Buscar por criterio\n2. Lista de Autores\n3. Agregar libro\n";
         cout << "Elige una opción: ";
         int opcion;
         cin >> opcion;
@@ -510,42 +743,17 @@ void menu() {
         case 2:
             imprimir_autores();
             break;
+        case 3:
+            agregar();
+            break;
         default:
             cout << "Opción no válida. Intenta de nuevo.\n";
         }
     }
 }
-//La hice pero no se que hacer con ella
-bool traer_libros(){
-    string linea;
-    char Libro_bus[50]="";
-    ifstream fs("Libros.txt");
-    while (getline(fs, linea))
-    {
-        int i=0;
-        for(; i < linea.length();i++){
-            if (linea[i]==','){break;}
-            Libro_bus[i]=linea[i];
-        }
-        Libro_bus[i]='\0';
-        memset(Libro_bus, 0, sizeof(Libro_bus));
-    }
-    fs.close();
-    return true;
-}
-
-void agregar(){
-    Genero tipo;
-    char titulo[100], autor[50];
-    int ano, mes, dia, dig;
-}
 
 int main() {
-    crearLibro(AVENTURA,"Robert Jordan", "El ojo del mundo", 1990,1,15);
-    crearLibro(AVENTURA,"Robert Jordan", "El despertar de los heroes", 1990,11,15);
-    crearLibro(AVENTURA,"Robert Jordan", "El dragon renacido", 1991,9,15);
-    crearLibro(AVENTURA,"Robert Jordan", "El aumento de la sombra", 1992,9,15);
-    crearLibro(HORROR, "Stephen King", "It",1986,9,15);
+    traer_libros();
     menu();
     return 0;
 };
