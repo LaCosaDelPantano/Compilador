@@ -31,6 +31,7 @@ typedef struct Libro {
 
 // Lista principal de libros organizada por autor
 Autor* listaAutor = nullptr;
+//Libro* imprimir_lib_aut=nullptr;
 
 Autor* CrearAutor(const char* nombreAutor) {
     // Crear un nuevo nodo Autor
@@ -492,14 +493,15 @@ int imprimir_libro(Libro* seleccionado, const char* autor) {
     } while (sel!=0); // Repetir hasta que el usuario elija regresar
 }
 
-void imprimir_lib_aut(Libro* seleccionado, const char* autor) {
-    if (seleccionado == nullptr) {
+void imprimir_lib_aut(Autor* autor_imp, const char* autor) {
+    if (autor_imp->primer_Lib->siguiente == nullptr) {
         cout << "No hay libros para el autor: " << autor << ".\n";
         return;
     }
 
     int sel;
     do {
+        Libro* seleccionado= autor_imp->primer_Lib;
         seleccionado=seleccionado->siguiente;
         cout << "------------- " << autor << " -------------\n";
         cout << "0. Regresar\n";
@@ -523,7 +525,9 @@ void imprimir_lib_aut(Libro* seleccionado, const char* autor) {
         Libro* libroSeleccionado = bus_lib(sel, seleccionado);
         if (libroSeleccionado != nullptr) {
             int resultado = imprimir_libro(libroSeleccionado, autor);
-            return;
+            if (resultado==0){
+                continue;
+            }
         } else {
             cout << "Número no válido. Intenta de nuevo.\n";
         }
@@ -553,7 +557,7 @@ void imprimir_autores() {
         // Buscar el autor seleccionado
         imprimir = bus_aut(sel);
         if (imprimir != nullptr) {
-            imprimir_lib_aut(imprimir->primer_Lib, imprimir->autor);
+            imprimir_lib_aut(imprimir, imprimir->autor);
         } else {
             cout << "Número no válido. Intenta de nuevo.\n";
         }
@@ -625,7 +629,7 @@ void por_Crit() {
 
             Autor* local = buscar(Nom_til);
             if (local != nullptr) {
-                imprimir_lib_aut(local->primer_Lib->siguiente, local->autor);
+                imprimir_lib_aut(local, local->autor);
             } else {
                 cout << "No se encontró el autor.\n";
             }
