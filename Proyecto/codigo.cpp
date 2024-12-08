@@ -492,7 +492,7 @@ int imprimir_libro(Libro* seleccionado, const char* autor) {
         }
     } while (sel!=0); // Repetir hasta que el usuario elija regresar
 }
-
+//Cambie de libro a autor para que no requiera la direccion
 void imprimir_lib_aut(Autor* autor_imp, const char* autor) {
     if (autor_imp->primer_Lib->siguiente == nullptr) {
         cout << "No hay libros para el autor: " << autor << ".\n";
