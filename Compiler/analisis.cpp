@@ -18,6 +18,8 @@ typedef struct {
     char value[100];
 } Token;
 
+
+/*Dame verga*/
 typedef enum {
     TYPE_INT,
     TYPE_FLOAT,
