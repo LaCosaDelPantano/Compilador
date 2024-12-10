@@ -5,13 +5,14 @@
             "name": "Depuración C++",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src/a.exe", // Cambia según tu sistema operativo
+            "program": "${workspaceFolder}/analisis.exe", // Ruta al ejecutable
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}", // Directorio de trabajo
             "environment": [],
-            "externalConsole": true,
+            "externalConsole": true, // Usar consola externa
             "MIMode": "gdb",
+            "miDebuggerPath": "C:\\msys64\\ucrt64\\bin\\gdb.exe", // Ruta al depurador GDB
             "setupCommands": [
                 {
                     "description": "Habilitar impresión de símbolos",
