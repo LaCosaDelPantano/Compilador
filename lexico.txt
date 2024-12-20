@@ -1,0 +1,29 @@
+Palabras clave del lenguaje Tiny:
+Estructuras de control:
+if: condicional "si".
+then: para especificar el bloque de código si la condición es verdadera.
+else: para especificar el bloque de código si la condición es falsa.
+end: para marcar el final de un bloque (por ejemplo, de un if o un while).
+for: bucle de control.
+while: bucle condicional.
+
+Declaraciones:
+dilan: palabra clave personalizada (puede ser usada como una declaración de inicio de programa como el main en c ).
+rafael: palabra clave personalizada (usada para finalizar).
+read: para entrada de datos.
+write: para salida de datos.
+Operaciones lógicas:
+true y false: valores booleanos.
+and, or, not: operadores lógicos.
+Declaraciones de variables:
+int: para enteros.
+bool: para booleanos.
+Símbolos y operadores:
+Aritméticos: +, -, *, /
+Asignación: =
+Comparación: <, <=, >, >=, =, !=
+Paréntesis: (, )
+Punto y coma: ; para finalizar declaraciones.
+Comentarios:
+Los comentarios estarán delimitados entre { y }. Ejemplo: { este es un comentario }.
+
