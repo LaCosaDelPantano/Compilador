@@ -19,12 +19,16 @@ typedef struct {//Define la longitud y tipo de token
 } Token;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 /*Dame verga*/
 typedef enum {
 =======
 typedef enum {//Identifica el tipo de numero
 >>>>>>> 77b84b6f62dfafa1510011eea821838caf02befd
+=======
+typedef enum {//Identifica el tipo de numero
+>>>>>>> 98201b84c136d0ad4952ae0878499ad67ad5a13c
     TYPE_INT,
     TYPE_FLOAT,
     TYPE_UNKNOWN

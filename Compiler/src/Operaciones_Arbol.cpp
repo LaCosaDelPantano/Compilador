@@ -63,8 +63,11 @@ int main() {
     cout<<"\t\t\t\t\t\t  GRUPO: 5CM23"<<endl;
     cout<<"\t\t\t\t\t     Analisis de Algoritmos\n"<<endl;
     cout<<"------------------------------------------------------------------------------------------------------------------------"<<endl;
+<<<<<<< HEAD
     Nodito* raiz = nullptr;
     int opcion, valor;
+=======
+>>>>>>> 98201b84c136d0ad4952ae0878499ad67ad5a13c
     do {
         cout << "\n1. Insertar valor\n2. Buscar valor\n3. Eliminar valor\n4. Mostrar inorden\n0. Salir\nSelecciona: ";
         cin >> opcion;
