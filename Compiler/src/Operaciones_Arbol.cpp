@@ -64,8 +64,11 @@ int main() {
     cout<<"\t\t\t\t\t     Analisis de Algoritmos\n"<<endl;
     cout<<"------------------------------------------------------------------------------------------------------------------------"<<endl;
 <<<<<<< HEAD
+<<<<<<< HEAD
     Nodito* raiz = nullptr;
     int opcion, valor;
+=======
+>>>>>>> 98201b84c136d0ad4952ae0878499ad67ad5a13c
 =======
 >>>>>>> 98201b84c136d0ad4952ae0878499ad67ad5a13c
     do {
