@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include <string>
 #include <iostream>
 #include <stdlib.h>
 
@@ -299,7 +300,6 @@ int parse_expression(const char* input, int* pos) {
     string expresion;
     TokenType temp=token.tipo;
     int n_temp;
-    bool amp=true;
     char valor[20];
     if (token.tipo == TOKEN_NUMBER || token.tipo == TOKEN_IDENTIFIER) {
         if (token.tipo == TOKEN_IDENTIFIER) {
@@ -379,15 +379,13 @@ int parse_expression(const char* input, int* pos) {
         exit(1);
     }
 
-    if(amp){
-        n_temp =operation(expresion);
-        size_t i;
-        for (i = 0; i < strlen(token.value) && i < sizeof(auxiliary) - 1; i++) {
-            auxiliary[i] = token.value[i];
-        }
-        auxiliary[i] = '\0';
-        return n_temp;
-        }
+    n_temp =operation(expresion);
+    size_t i;
+    for (i = 0; i < strlen(token.value) && i < sizeof(auxiliary) - 1; i++) {
+        auxiliary[i] = token.value[i];
+    }
+    auxiliary[i] = '\0';
+    return n_temp;
 
     // Ajustar el buffer auxiliary con los datos de token.value
     return NULL;

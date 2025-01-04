@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include <string>
 #include <iostream>
 #include <stdlib.h>
 
@@ -265,7 +266,7 @@ int operation(string expresion){
             n2[j]='\0';
             N2=atoi(n2);
         }else{
-            while(!strchr("#$&%",expresion[i])){
+            while(!strchr("#$&%;",expresion[i])){
             cons[j++]=expresion[i++];
             }
             cons[j]='\0';
@@ -312,6 +313,8 @@ int parse_expression(const char* input, int* pos) {
                 valor[i]=token.value[i];
             }
             valor[i]='\0';
+            Symbol* get_value = find_symbol(valor);
+            n_temp=get_value->value;
         }
         if (token.tipo == TOKEN_NUMBER){
             n_temp = atoi(token.value);
@@ -326,6 +329,24 @@ int parse_expression(const char* input, int* pos) {
             exit(1);
         }
 
+        if (strchr("<>=", token.value[0]) && !check_2) {
+        size_t i;
+        for (i = 0; i < strlen(token.value) && i < sizeof(auxiliary) - 1; i++) {
+            auxiliary[i] = token.value[i];
+        }
+        auxiliary[i] = '\0';
+        return n_temp;
+        }
+
+        if(token.value[0]==';' && !check_2){
+            size_t i;
+            for (i = 0; i < strlen(token.value) && i < sizeof(auxiliary) - 1; i++) {
+                auxiliary[i] = token.value[i];
+            }
+            auxiliary[i] = '\0';
+            return n_temp;
+        }
+
         if (temp==TOKEN_IDENTIFIER && !check_2 && token.value[0] == ')'){
             Symbol* get_value = find_symbol(valor);
             size_t i;
@@ -336,7 +357,7 @@ int parse_expression(const char* input, int* pos) {
             return get_value->value;
         }
 
-        if(temp==TOKEN_NUMBER && !check_2){
+        if(temp==TOKEN_NUMBER && !check_2 && !strchr("#$%&", token.value[0])){
             size_t i;
             for (i = 0; i < strlen(token.value) && i < sizeof(auxiliary) - 1; i++) {
                 auxiliary[i] = token.value[i];
@@ -423,19 +444,16 @@ void parse_keys(const char* input, int* pos) {
 
     token = get_next_token(input, pos);
 
-    if (strcmp(token.value, "mauricioemilianovelazquezcaudillo") != 0) {
+    while(strcmp(token.value, "mauricioemilianovelazquezcaudillo") != 0){
         if (check){
             *pos = aux;
             parse_statement(input, pos);
-
-            token = get_next_token(input, pos);
+            aux = *pos;
         }
-        check=true;
-        while(strcmp(token.value, "mauricioemilianovelazquezcaudillo") != 0){
-            token = get_next_token(input, pos);
-            if(token.value[0]=='\0'){printf("Error de sintaxis: se esperaba 'mauricioemilianovelazquezcaudillo'.\n"); exit(1);}
-        }
+        token = get_next_token(input, pos);
+        if(token.value[0]=='\0'){printf("Error de sintaxis: se esperaba 'mauricioemilianovelazquezcaudillo'.\n"); exit(1);}
     }
+    check=true;
 }
 
 bool if_solve(int n1, int n2, char exp){
@@ -489,14 +507,24 @@ void parse_if_statement(const char* input, int* pos) {
     parse_keys(input, pos);
 }
 
+bool inc;
 void incremento(const char* input, int* pos){
     Token token = get_next_token(input, pos);
-    if (token.tipo == TOKEN_IDENTIFIER) {
-        if (!find_symbol(token.value)) {
-            printf("Error sem�ntico: La variable '%s' no est� declarada.\n", token.value);
-            exit(1);
-        }
+    char valor[20];
+
+    if (token.tipo != TOKEN_IDENTIFIER){
+        printf("Error sem�ntico: Se esperaba un identificador.\n", token.value);
+        exit(1);
     }
+    if (!find_symbol(token.value)) {
+        printf("Error sem�ntico: La variable '%s' no est� declarada.\n", token.value);
+        exit(1);
+    }
+    int i = 0;
+    for (;token.value[i]!='\0'; i++){
+        valor[i]=token.value[i];
+    }
+    valor[i]='\0';
     
     token = get_next_token(input, pos);
 
@@ -504,12 +532,17 @@ void incremento(const char* input, int* pos){
         printf("Error de sintaxis: se esperaba '='.\n");
     }
 
-    parse_expression(input, pos);
+    int sal = parse_expression(input, pos);
+    if (inc){
+        add_value(valor, sal);
+    }
 
 }
 
 void saul_expression(const char* input, int* pos) {
     Token token = get_next_token(input, pos);
+    int aux, aux_2, aux_3;
+    check_2 = false;
 
     // Verificar apertura de par�ntesis
     if (token.value[0] != '(') {
@@ -534,7 +567,18 @@ void saul_expression(const char* input, int* pos) {
     parse_declaration(input, pos);
 
     // Analizar la condici�n del bucle
-    parse_expression(input, pos);
+    char op[2];
+    aux_2 = *pos;
+    int exp1 = parse_expression(input, pos);
+
+    size_t k;
+    for (k = 0; k < sizeof(auxiliary) - 1 && token.value[k] != '\0'; k++) {
+        op[k] = auxiliary[k];
+    }
+    token.value[k] = '\0';
+    if (!strchr("=<>",op[0])){printf("Error de sintaxis: Se esperaba '=<>'.\n"); exit(1);};
+
+    int exp2 = parse_expression(input, pos);
 
     // Verificar punto y coma tras la condici�n
     size_t i;
@@ -547,26 +591,37 @@ void saul_expression(const char* input, int* pos) {
         printf("Error de sintaxis: Se esperaba ';' despu�s de la condici�n.\n");
         exit(1);
     }
-
+    aux_3 = *pos;
+    inc = false;
     // Analizar la expresi�n de incremento
     incremento(input, pos);
 
-    size_t k;
     for (k = 0; k < sizeof(auxiliary) - 1 && token.value[k] != '\0'; k++) {
         token.value[k] = auxiliary[k];
     }
     token.value[k] = '\0';
-
+    
     // Verificar cierre de par�ntesis
     if (token.value[0] != ')') {
         printf("Error de sintaxis: Se esperaba ')'.\n");
         exit(1);
     }
-
+    check_2 = true;
+    inc = true;
+    aux = *pos;
     // Analizar el cuerpo del bucle
-    parse_keys(input, pos);
+    while(if_solve(exp1,exp2,op[0])){
+        *pos = aux_3;
+        incremento(input, pos);
+        *pos = aux_2;
+        check_2 = false;
+        exp1 = parse_expression(input, pos);
+        exp2 = parse_expression(input, pos);
+        check_2 = true;
+        *pos = aux;
+        parse_keys(input, pos);
+    }
 }
-
 int imp_expr(Token token, const char* input, int* pos, int* pos_aux){
     int aux = *pos;
     Token auxiliar = token;
@@ -690,59 +745,6 @@ void parse_program(const char* input, int* pos) {
     while (input[*pos] != '\0') {
         parse_statement(input, pos);
     }
-}
-
-void saul(const char* input, int* pos) {  //Declaracion de la funcion Saul
-    Token token = get_next_token(input, pos);
-
-    // Verificar '('
-    if (token.value[0] != '(') {
-        printf("Error de sintaxis: Se esperaba '('.\n");
-        exit(1);
-    }
-
-    // Analizar la inicialización
-    token = get_next_token(input, pos);
-    if (token.tipo != TOKEN_IDENTIFIER && token.tipo != TOKEN_KEYWORD) {
-        printf("Error de sintaxis en la inicialización.\n");
-        exit(1);
-    }
-    parse_declaration(input, pos);
-
-    // Analizar la condición del bucle
-    token = get_next_token(input, pos);
-    if (token.value[0] != ';') {
-        parse_expression(input, pos);
-    } else {
-        printf("Error de sintaxis: Se esperaba una condición después del punto y coma.\n");
-        exit(1);
-    }
-
-    // Verificar ';'
-    token = get_next_token(input, pos);
-    if (token.value[0] != ';') {
-        printf("Error de sintaxis: Se esperaba ';' después de la condición.\n");
-        exit(1);
-    }
-
-    // Analizar el incremento
-    token = get_next_token(input, pos);
-    if (token.tipo == TOKEN_IDENTIFIER) {
-        incremento(input, pos);
-    } else {
-        printf("Error de sintaxis en el incremento.\n");
-        exit(1);
-    }
-
-    // Verificar ')'
-    token = get_next_token(input, pos);
-    if (token.value[0] != ')') {
-        printf("Error de sintaxis: Se esperaba ')'.\n");
-        exit(1);
-    }
-
-    // Analizar el cuerpo del bucle
-    parse_keys(input, pos);
 }
 
 

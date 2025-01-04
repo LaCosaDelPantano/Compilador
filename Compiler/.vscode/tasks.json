@@ -7,36 +7,11 @@
             "command": "g++",
             "args": [
                 "-g",
-                "-std=c++17",
-                "${workspaceFolder}/*.cpp",
-                "-o",
-                "${workspaceFolder}/analisis.exe"
-            ],
-            "group": "build",
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "detail": "Tarea para compilar el código C++."
-        },
-        {
-            "label": "C/C++: gcc.exe build active file",
-            "type": "shell",
-            "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe",
-            "args": [
-                "-fdiagnostics-color=always",
-                "-g",
                 "${file}",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}.exe"
+                "${fileDirname}/a.exe"
             ],
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "detail": "Tarea generada por el depurador."
+            "group": "build"
         },
         {
             "type": "cppbuild",

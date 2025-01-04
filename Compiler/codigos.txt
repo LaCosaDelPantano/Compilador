@@ -1,0 +1,9 @@
+rhaeshis con = 3&3;
+rhaeshis num = 9#3;
+saul(rhaeshis i = 0; i < con ; i = i # 2)
+mauricioemilianovelazquezcaudillo
+vezof(i<con$2)mauricioemilianovelazquezcaudillo
+num = 9#i;
+voktys (num "Hola putos")
+mauricioemilianovelazquezcaudillo
+mauricioemilianovelazquezcaudillo
