@@ -1,0 +1,3398 @@
+auxiliary:
+        .zero   100
+symbol_table:
+        .zero   8
+.LC0:
+        .string "vezof"
+.LC1:
+        .string "noreth"
+.LC2:
+        .string "kash"
+.LC3:
+        .string "rhaeshisar"
+.LC4:
+        .string "rhaeshis"
+.LC5:
+        .string "dothraki"
+.LC6:
+        .string "saul"
+.LC7:
+        .string "mauricioemilianovelazquezcaudillo"
+.LC8:
+        .string "voktys"
+keywords:
+        .quad   .LC0
+        .quad   .LC1
+        .quad   .LC2
+        .quad   .LC3
+        .quad   .LC4
+        .quad   .LC5
+        .quad   .LC6
+        .quad   .LC7
+        .quad   .LC8
+        .quad   0
+is_keyword(char const*):
+        push    rbp
+        mov     rbp, rsp
+        sub     rsp, 32
+        mov     QWORD PTR [rbp-24], rdi
+        mov     DWORD PTR [rbp-4], 0
+        jmp     .L19
+.L22:
+        mov     eax, DWORD PTR [rbp-4]
+        cdqe
+        mov     rdx, QWORD PTR keywords[0+rax*8]
+        mov     rax, QWORD PTR [rbp-24]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    strcmp
+        test    eax, eax
+        jne     .L20
+        mov     eax, 1
+        jmp     .L21
+.L20:
+        add     DWORD PTR [rbp-4], 1
+.L19:
+        mov     eax, DWORD PTR [rbp-4]
+        cdqe
+        mov     rax, QWORD PTR keywords[0+rax*8]
+        test    rax, rax
+        jne     .L22
+        mov     eax, 0
+.L21:
+        leave
+        ret
+find_symbol(char const*):
+        push    rbp
+        mov     rbp, rsp
+        sub     rsp, 32
+        mov     QWORD PTR [rbp-24], rdi
+        mov     rax, QWORD PTR symbol_table[rip]
+        mov     QWORD PTR [rbp-8], rax
+        jmp     .L24
+.L27:
+        mov     rax, QWORD PTR [rbp-8]
+        mov     rdx, QWORD PTR [rbp-24]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    strcmp
+        test    eax, eax
+        jne     .L25
+        mov     rax, QWORD PTR [rbp-8]
+        jmp     .L26
+.L25:
+        mov     rax, QWORD PTR [rbp-8]
+        mov     rax, QWORD PTR [rax+112]
+        mov     QWORD PTR [rbp-8], rax
+.L24:
+        cmp     QWORD PTR [rbp-8], 0
+        jne     .L27
+        mov     eax, 0
+.L26:
+        leave
+        ret
+add_value(char const*, int):
+        push    rbp
+        mov     rbp, rsp
+        sub     rsp, 32
+        mov     QWORD PTR [rbp-24], rdi
+        mov     DWORD PTR [rbp-28], esi
+        mov     rax, QWORD PTR [rbp-24]
+        mov     rdi, rax
+        call    find_symbol(char const*)
+        mov     QWORD PTR [rbp-8], rax
+        cmp     QWORD PTR [rbp-8], 0
+        je      .L30
+        mov     rax, QWORD PTR [rbp-8]
+        mov     edx, DWORD PTR [rbp-28]
+        mov     DWORD PTR [rax+104], edx
+.L30:
+        nop
+        leave
+        ret
+free_symbol_table():
+        push    rbp
+        mov     rbp, rsp
+        sub     rsp, 16
+        mov     rax, QWORD PTR symbol_table[rip]
+        mov     QWORD PTR [rbp-8], rax
+        jmp     .L32
+.L33:
+        mov     rax, QWORD PTR [rbp-8]
+        mov     QWORD PTR [rbp-16], rax
+        mov     rax, QWORD PTR [rbp-8]
+        mov     rax, QWORD PTR [rax+112]
+        mov     QWORD PTR [rbp-8], rax
+        mov     rax, QWORD PTR [rbp-16]
+        mov     rdi, rax
+        call    free
+.L32:
+        cmp     QWORD PTR [rbp-8], 0
+        jne     .L33
+        mov     QWORD PTR symbol_table[rip], 0
+        nop
+        leave
+        ret
+.LC9:
+        .string "Error sem\357\277\275ntico: La variable '%s' ya est\357\277\275 declarada.\n"
+.LC10:
+        .string "Error: No se pudo asignar memoria para la nueva variable."
+.LC11:
+        .string "Error sem\357\277\275ntico: El nombre de la variable '%s' es demasiado largo.\n"
+add_symbol(char const*, DataType):
+        push    rbp
+        mov     rbp, rsp
+        sub     rsp, 48
+        mov     QWORD PTR [rbp-40], rdi
+        mov     DWORD PTR [rbp-44], esi
+        mov     rax, QWORD PTR [rbp-40]
+        mov     rdi, rax
+        call    find_symbol(char const*)
+        test    rax, rax
+        setne   al
+        test    al, al
+        je      .L35
+        mov     rax, QWORD PTR [rbp-40]
+        mov     rsi, rax
+        mov     edi, OFFSET FLAT:.LC9
+        mov     eax, 0
+        call    printf
+        mov     edi, 1
+        call    exit
+.L35:
+        mov     edi, 120
+        call    malloc
+        mov     QWORD PTR [rbp-16], rax
+        cmp     QWORD PTR [rbp-16], 0
+        jne     .L36
+        mov     edi, OFFSET FLAT:.LC10
+        call    puts
+        mov     edi, 1
+        call    exit
+.L36:
+        mov     rax, QWORD PTR [rbp-40]
+        mov     rdi, rax
+        call    strlen
+        mov     QWORD PTR [rbp-24], rax
+        cmp     QWORD PTR [rbp-24], 99
+        jbe     .L37
+        mov     rax, QWORD PTR [rbp-40]
+        mov     rsi, rax
+        mov     edi, OFFSET FLAT:.LC11
+        mov     eax, 0
+        call    printf
+        mov     edi, 1
+        call    exit
+.L37:
+        mov     QWORD PTR [rbp-8], 0
+        jmp     .L38
+.L39:
+        mov     rdx, QWORD PTR [rbp-40]
+        mov     rax, QWORD PTR [rbp-8]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        mov     rcx, QWORD PTR [rbp-16]
+        mov     rdx, QWORD PTR [rbp-8]
+        add     rdx, rcx
+        mov     BYTE PTR [rdx], al
+        add     QWORD PTR [rbp-8], 1
+.L38:
+        mov     rax, QWORD PTR [rbp-8]
+        cmp     QWORD PTR [rbp-24], rax
+        jnb     .L39
+        mov     rax, QWORD PTR [rbp-16]
+        mov     edx, DWORD PTR [rbp-44]
+        mov     DWORD PTR [rax+100], edx
+        mov     rdx, QWORD PTR symbol_table[rip]
+        mov     rax, QWORD PTR [rbp-16]
+        mov     QWORD PTR [rax+112], rdx
+        mov     rax, QWORD PTR [rbp-16]
+        mov     QWORD PTR symbol_table[rip], rax
+        nop
+        leave
+        ret
+.LC12:
+        .string "#$&%"
+get_next_token(char const*, int*):
+        push    rbp
+        mov     rbp, rsp
+        push    rbx
+        sub     rsp, 152
+        mov     QWORD PTR [rbp-136], rdi
+        mov     QWORD PTR [rbp-144], rsi
+        mov     QWORD PTR [rbp-152], rdx
+        mov     DWORD PTR [rbp-128], 4
+        mov     DWORD PTR [rbp-20], 0
+        jmp     .L41
+.L42:
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        lea     edx, [rax+1]
+        mov     rax, QWORD PTR [rbp-152]
+        mov     DWORD PTR [rax], edx
+.L41:
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-144]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        movsx   eax, al
+        mov     edi, eax
+        call    isspace
+        test    eax, eax
+        jne     .L42
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-144]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        test    al, al
+        jne     .L43
+        mov     BYTE PTR [rbp-124], 0
+        mov     rax, QWORD PTR [rbp-136]
+        mov     rcx, QWORD PTR [rbp-128]
+        mov     rbx, QWORD PTR [rbp-120]
+        mov     QWORD PTR [rax], rcx
+        mov     QWORD PTR [rax+8], rbx
+        mov     rcx, QWORD PTR [rbp-112]
+        mov     rbx, QWORD PTR [rbp-104]
+        mov     QWORD PTR [rax+16], rcx
+        mov     QWORD PTR [rax+24], rbx
+        mov     rcx, QWORD PTR [rbp-96]
+        mov     rbx, QWORD PTR [rbp-88]
+        mov     QWORD PTR [rax+32], rcx
+        mov     QWORD PTR [rax+40], rbx
+        mov     rcx, QWORD PTR [rbp-80]
+        mov     rbx, QWORD PTR [rbp-72]
+        mov     QWORD PTR [rax+48], rcx
+        mov     QWORD PTR [rax+56], rbx
+        mov     rcx, QWORD PTR [rbp-64]
+        mov     rbx, QWORD PTR [rbp-56]
+        mov     QWORD PTR [rax+64], rcx
+        mov     QWORD PTR [rax+72], rbx
+        mov     rcx, QWORD PTR [rbp-48]
+        mov     rbx, QWORD PTR [rbp-40]
+        mov     QWORD PTR [rax+80], rcx
+        mov     QWORD PTR [rax+88], rbx
+        mov     rdx, QWORD PTR [rbp-32]
+        mov     QWORD PTR [rax+96], rdx
+        jmp     .L62
+.L43:
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-144]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        cmp     al, 47
+        jne     .L45
+        jmp     .L46
+.L48:
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        lea     edx, [rax+1]
+        mov     rax, QWORD PTR [rbp-152]
+        mov     DWORD PTR [rax], edx
+.L46:
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-144]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        test    al, al
+        je      .L47
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-144]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        cmp     al, 47
+        jne     .L48
+.L47:
+        mov     rax, QWORD PTR [rbp-136]
+        mov     rdx, QWORD PTR [rbp-152]
+        mov     rcx, QWORD PTR [rbp-144]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        jmp     .L62
+.L45:
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-144]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        movsx   eax, al
+        mov     edi, eax
+        call    isalpha
+        test    eax, eax
+        jne     .L51
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-144]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        cmp     al, 95
+        jne     .L50
+        jmp     .L51
+.L52:
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-144]
+        add     rax, rdx
+        movzx   edx, BYTE PTR [rax]
+        mov     eax, DWORD PTR [rbp-20]
+        lea     ecx, [rax+1]
+        mov     DWORD PTR [rbp-20], ecx
+        cdqe
+        mov     BYTE PTR [rbp-124+rax], dl
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        lea     edx, [rax+1]
+        mov     rax, QWORD PTR [rbp-152]
+        mov     DWORD PTR [rax], edx
+.L51:
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-144]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        movsx   eax, al
+        mov     edi, eax
+        call    isalnum
+        test    eax, eax
+        jne     .L52
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-144]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        cmp     al, 95
+        je      .L52
+        mov     eax, DWORD PTR [rbp-20]
+        cdqe
+        mov     BYTE PTR [rbp-124+rax], 0
+        lea     rax, [rbp-128]
+        add     rax, 4
+        mov     rdi, rax
+        call    is_keyword(char const*)
+        test    eax, eax
+        setne   al
+        test    al, al
+        je      .L53
+        mov     DWORD PTR [rbp-128], 0
+        jmp     .L54
+.L53:
+        mov     DWORD PTR [rbp-128], 1
+.L54:
+        mov     rax, QWORD PTR [rbp-136]
+        mov     rcx, QWORD PTR [rbp-128]
+        mov     rbx, QWORD PTR [rbp-120]
+        mov     QWORD PTR [rax], rcx
+        mov     QWORD PTR [rax+8], rbx
+        mov     rcx, QWORD PTR [rbp-112]
+        mov     rbx, QWORD PTR [rbp-104]
+        mov     QWORD PTR [rax+16], rcx
+        mov     QWORD PTR [rax+24], rbx
+        mov     rcx, QWORD PTR [rbp-96]
+        mov     rbx, QWORD PTR [rbp-88]
+        mov     QWORD PTR [rax+32], rcx
+        mov     QWORD PTR [rax+40], rbx
+        mov     rcx, QWORD PTR [rbp-80]
+        mov     rbx, QWORD PTR [rbp-72]
+        mov     QWORD PTR [rax+48], rcx
+        mov     QWORD PTR [rax+56], rbx
+        mov     rcx, QWORD PTR [rbp-64]
+        mov     rbx, QWORD PTR [rbp-56]
+        mov     QWORD PTR [rax+64], rcx
+        mov     QWORD PTR [rax+72], rbx
+        mov     rcx, QWORD PTR [rbp-48]
+        mov     rbx, QWORD PTR [rbp-40]
+        mov     QWORD PTR [rax+80], rcx
+        mov     QWORD PTR [rax+88], rbx
+        mov     rdx, QWORD PTR [rbp-32]
+        mov     QWORD PTR [rax+96], rdx
+        jmp     .L62
+.L50:
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-144]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        movsx   eax, al
+        sub     eax, 48
+        cmp     eax, 9
+        setbe   al
+        movzx   eax, al
+        test    eax, eax
+        jne     .L55
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-144]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        cmp     al, 46
+        jne     .L56
+.L55:
+        mov     DWORD PTR [rbp-24], 0
+        jmp     .L57
+.L59:
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-144]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        cmp     al, 46
+        jne     .L58
+        mov     DWORD PTR [rbp-24], 1
+.L58:
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-144]
+        add     rax, rdx
+        movzx   edx, BYTE PTR [rax]
+        mov     eax, DWORD PTR [rbp-20]
+        lea     ecx, [rax+1]
+        mov     DWORD PTR [rbp-20], ecx
+        cdqe
+        mov     BYTE PTR [rbp-124+rax], dl
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        lea     edx, [rax+1]
+        mov     rax, QWORD PTR [rbp-152]
+        mov     DWORD PTR [rax], edx
+.L57:
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-144]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        movsx   eax, al
+        sub     eax, 48
+        cmp     eax, 9
+        setbe   al
+        movzx   eax, al
+        test    eax, eax
+        jne     .L59
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-144]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        cmp     al, 46
+        jne     .L60
+        cmp     DWORD PTR [rbp-24], 0
+        je      .L59
+.L60:
+        mov     eax, DWORD PTR [rbp-20]
+        cdqe
+        mov     BYTE PTR [rbp-124+rax], 0
+        mov     DWORD PTR [rbp-128], 2
+        mov     rax, QWORD PTR [rbp-136]
+        mov     rcx, QWORD PTR [rbp-128]
+        mov     rbx, QWORD PTR [rbp-120]
+        mov     QWORD PTR [rax], rcx
+        mov     QWORD PTR [rax+8], rbx
+        mov     rcx, QWORD PTR [rbp-112]
+        mov     rbx, QWORD PTR [rbp-104]
+        mov     QWORD PTR [rax+16], rcx
+        mov     QWORD PTR [rax+24], rbx
+        mov     rcx, QWORD PTR [rbp-96]
+        mov     rbx, QWORD PTR [rbp-88]
+        mov     QWORD PTR [rax+32], rcx
+        mov     QWORD PTR [rax+40], rbx
+        mov     rcx, QWORD PTR [rbp-80]
+        mov     rbx, QWORD PTR [rbp-72]
+        mov     QWORD PTR [rax+48], rcx
+        mov     QWORD PTR [rax+56], rbx
+        mov     rcx, QWORD PTR [rbp-64]
+        mov     rbx, QWORD PTR [rbp-56]
+        mov     QWORD PTR [rax+64], rcx
+        mov     QWORD PTR [rax+72], rbx
+        mov     rcx, QWORD PTR [rbp-48]
+        mov     rbx, QWORD PTR [rbp-40]
+        mov     QWORD PTR [rax+80], rcx
+        mov     QWORD PTR [rax+88], rbx
+        mov     rdx, QWORD PTR [rbp-32]
+        mov     QWORD PTR [rax+96], rdx
+        jmp     .L62
+.L56:
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-144]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        movsx   eax, al
+        mov     esi, eax
+        mov     edi, OFFSET FLAT:.LC12
+        call    strchr
+        test    rax, rax
+        je      .L61
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-144]
+        add     rax, rdx
+        movzx   edx, BYTE PTR [rax]
+        mov     eax, DWORD PTR [rbp-20]
+        lea     ecx, [rax+1]
+        mov     DWORD PTR [rbp-20], ecx
+        cdqe
+        mov     BYTE PTR [rbp-124+rax], dl
+        mov     eax, DWORD PTR [rbp-20]
+        cdqe
+        mov     BYTE PTR [rbp-124+rax], 0
+        mov     DWORD PTR [rbp-128], 3
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        lea     edx, [rax+1]
+        mov     rax, QWORD PTR [rbp-152]
+        mov     DWORD PTR [rax], edx
+        mov     rax, QWORD PTR [rbp-136]
+        mov     rcx, QWORD PTR [rbp-128]
+        mov     rbx, QWORD PTR [rbp-120]
+        mov     QWORD PTR [rax], rcx
+        mov     QWORD PTR [rax+8], rbx
+        mov     rcx, QWORD PTR [rbp-112]
+        mov     rbx, QWORD PTR [rbp-104]
+        mov     QWORD PTR [rax+16], rcx
+        mov     QWORD PTR [rax+24], rbx
+        mov     rcx, QWORD PTR [rbp-96]
+        mov     rbx, QWORD PTR [rbp-88]
+        mov     QWORD PTR [rax+32], rcx
+        mov     QWORD PTR [rax+40], rbx
+        mov     rcx, QWORD PTR [rbp-80]
+        mov     rbx, QWORD PTR [rbp-72]
+        mov     QWORD PTR [rax+48], rcx
+        mov     QWORD PTR [rax+56], rbx
+        mov     rcx, QWORD PTR [rbp-64]
+        mov     rbx, QWORD PTR [rbp-56]
+        mov     QWORD PTR [rax+64], rcx
+        mov     QWORD PTR [rax+72], rbx
+        mov     rcx, QWORD PTR [rbp-48]
+        mov     rbx, QWORD PTR [rbp-40]
+        mov     QWORD PTR [rax+80], rcx
+        mov     QWORD PTR [rax+88], rbx
+        mov     rdx, QWORD PTR [rbp-32]
+        mov     QWORD PTR [rax+96], rdx
+        jmp     .L62
+.L61:
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-144]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        mov     BYTE PTR [rbp-124], al
+        mov     BYTE PTR [rbp-123], 0
+        mov     rax, QWORD PTR [rbp-152]
+        mov     eax, DWORD PTR [rax]
+        lea     edx, [rax+1]
+        mov     rax, QWORD PTR [rbp-152]
+        mov     DWORD PTR [rax], edx
+        mov     rax, QWORD PTR [rbp-136]
+        mov     rcx, QWORD PTR [rbp-128]
+        mov     rbx, QWORD PTR [rbp-120]
+        mov     QWORD PTR [rax], rcx
+        mov     QWORD PTR [rax+8], rbx
+        mov     rcx, QWORD PTR [rbp-112]
+        mov     rbx, QWORD PTR [rbp-104]
+        mov     QWORD PTR [rax+16], rcx
+        mov     QWORD PTR [rax+24], rbx
+        mov     rcx, QWORD PTR [rbp-96]
+        mov     rbx, QWORD PTR [rbp-88]
+        mov     QWORD PTR [rax+32], rcx
+        mov     QWORD PTR [rax+40], rbx
+        mov     rcx, QWORD PTR [rbp-80]
+        mov     rbx, QWORD PTR [rbp-72]
+        mov     QWORD PTR [rax+48], rcx
+        mov     QWORD PTR [rax+56], rbx
+        mov     rcx, QWORD PTR [rbp-64]
+        mov     rbx, QWORD PTR [rbp-56]
+        mov     QWORD PTR [rax+64], rcx
+        mov     QWORD PTR [rax+72], rbx
+        mov     rcx, QWORD PTR [rbp-48]
+        mov     rbx, QWORD PTR [rbp-40]
+        mov     QWORD PTR [rax+80], rcx
+        mov     QWORD PTR [rax+88], rbx
+        mov     rdx, QWORD PTR [rbp-32]
+        mov     QWORD PTR [rax+96], rdx
+.L62:
+        mov     rax, QWORD PTR [rbp-136]
+        mov     rbx, QWORD PTR [rbp-8]
+        leave
+        ret
+temporal[abi:cxx11]:
+        .zero   32
+check:
+        .byte   1
+check_2:
+        .byte   1
+.LC13:
+        .string "Error de sintaxis: Se esperaba un identificador."
+.LC14:
+        .string "Error de sintaxis: Se esperaba '=' despu\357\277\275s del identificador."
+.LC15:
+        .string "Error de sintaxis: Se esperaba ';' al final de la declaraci\357\277\275n."
+parse_declaration(char const*, int*):
+        push    rbp
+        mov     rbp, rsp
+        sub     rsp, 272
+        mov     QWORD PTR [rbp-152], rdi
+        mov     QWORD PTR [rbp-160], rsi
+        mov     QWORD PTR [rbp-8], 0
+        jmp     .L64
+.L66:
+        mov     rax, QWORD PTR [rbp-8]
+        add     rax, OFFSET FLAT:auxiliary
+        movzx   eax, BYTE PTR [rax]
+        lea     rcx, [rbp-140]
+        mov     rdx, QWORD PTR [rbp-8]
+        add     rdx, rcx
+        mov     BYTE PTR [rdx], al
+        add     QWORD PTR [rbp-8], 1
+.L64:
+        cmp     QWORD PTR [rbp-8], 98
+        ja      .L65
+        lea     rdx, [rbp-140]
+        mov     rax, QWORD PTR [rbp-8]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        test    al, al
+        jne     .L66
+.L65:
+        lea     rdx, [rbp-140]
+        mov     rax, QWORD PTR [rbp-8]
+        add     rax, rdx
+        mov     BYTE PTR [rax], 0
+        mov     DWORD PTR [rbp-12], 2
+        lea     rax, [rbp-144]
+        add     rax, 4
+        mov     esi, OFFSET FLAT:.LC4
+        mov     rdi, rax
+        call    strcmp
+        test    eax, eax
+        jne     .L67
+        mov     DWORD PTR [rbp-12], 0
+        jmp     .L68
+.L67:
+        lea     rax, [rbp-144]
+        add     rax, 4
+        mov     esi, OFFSET FLAT:.LC5
+        mov     rdi, rax
+        call    strcmp
+        test    eax, eax
+        jne     .L68
+        mov     DWORD PTR [rbp-12], 1
+.L68:
+        lea     rax, [rbp-272]
+        mov     rdx, QWORD PTR [rbp-160]
+        mov     rcx, QWORD PTR [rbp-152]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        mov     rax, QWORD PTR [rbp-272]
+        mov     rdx, QWORD PTR [rbp-264]
+        mov     QWORD PTR [rbp-144], rax
+        mov     QWORD PTR [rbp-136], rdx
+        mov     rax, QWORD PTR [rbp-256]
+        mov     rdx, QWORD PTR [rbp-248]
+        mov     QWORD PTR [rbp-128], rax
+        mov     QWORD PTR [rbp-120], rdx
+        mov     rax, QWORD PTR [rbp-240]
+        mov     rdx, QWORD PTR [rbp-232]
+        mov     QWORD PTR [rbp-112], rax
+        mov     QWORD PTR [rbp-104], rdx
+        mov     rax, QWORD PTR [rbp-224]
+        mov     rdx, QWORD PTR [rbp-216]
+        mov     QWORD PTR [rbp-96], rax
+        mov     QWORD PTR [rbp-88], rdx
+        mov     rax, QWORD PTR [rbp-208]
+        mov     rdx, QWORD PTR [rbp-200]
+        mov     QWORD PTR [rbp-80], rax
+        mov     QWORD PTR [rbp-72], rdx
+        mov     rax, QWORD PTR [rbp-192]
+        mov     rdx, QWORD PTR [rbp-184]
+        mov     QWORD PTR [rbp-64], rax
+        mov     QWORD PTR [rbp-56], rdx
+        mov     rax, QWORD PTR [rbp-176]
+        mov     QWORD PTR [rbp-48], rax
+        mov     eax, DWORD PTR [rbp-144]
+        cmp     eax, 1
+        je      .L69
+        mov     edi, OFFSET FLAT:.LC13
+        call    puts
+        mov     edi, 1
+        call    exit
+.L69:
+        mov     eax, DWORD PTR [rbp-12]
+        lea     rdx, [rbp-144]
+        add     rdx, 4
+        mov     esi, eax
+        mov     rdi, rdx
+        call    add_symbol(char const*, DataType)
+        lea     rax, [rbp-144]
+        add     rax, 4
+        mov     rsi, rax
+        mov     edi, OFFSET FLAT:temporal[abi:cxx11]
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator=(char const*)
+        lea     rax, [rbp-272]
+        mov     rdx, QWORD PTR [rbp-160]
+        mov     rcx, QWORD PTR [rbp-152]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        mov     rax, QWORD PTR [rbp-272]
+        mov     rdx, QWORD PTR [rbp-264]
+        mov     QWORD PTR [rbp-144], rax
+        mov     QWORD PTR [rbp-136], rdx
+        mov     rax, QWORD PTR [rbp-256]
+        mov     rdx, QWORD PTR [rbp-248]
+        mov     QWORD PTR [rbp-128], rax
+        mov     QWORD PTR [rbp-120], rdx
+        mov     rax, QWORD PTR [rbp-240]
+        mov     rdx, QWORD PTR [rbp-232]
+        mov     QWORD PTR [rbp-112], rax
+        mov     QWORD PTR [rbp-104], rdx
+        mov     rax, QWORD PTR [rbp-224]
+        mov     rdx, QWORD PTR [rbp-216]
+        mov     QWORD PTR [rbp-96], rax
+        mov     QWORD PTR [rbp-88], rdx
+        mov     rax, QWORD PTR [rbp-208]
+        mov     rdx, QWORD PTR [rbp-200]
+        mov     QWORD PTR [rbp-80], rax
+        mov     QWORD PTR [rbp-72], rdx
+        mov     rax, QWORD PTR [rbp-192]
+        mov     rdx, QWORD PTR [rbp-184]
+        mov     QWORD PTR [rbp-64], rax
+        mov     QWORD PTR [rbp-56], rdx
+        mov     rax, QWORD PTR [rbp-176]
+        mov     QWORD PTR [rbp-48], rax
+        movzx   eax, BYTE PTR [rbp-140]
+        cmp     al, 61
+        je      .L70
+        mov     edi, OFFSET FLAT:.LC14
+        call    puts
+        mov     edi, 1
+        call    exit
+.L70:
+        mov     rdx, QWORD PTR [rbp-160]
+        mov     rax, QWORD PTR [rbp-152]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    parse_expression(char const*, int*)
+        mov     DWORD PTR [rbp-28], eax
+        mov     edi, OFFSET FLAT:temporal[abi:cxx11]
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::c_str() const
+        mov     rdx, rax
+        mov     eax, DWORD PTR [rbp-28]
+        mov     esi, eax
+        mov     rdi, rdx
+        call    add_value(char const*, int)
+        mov     QWORD PTR [rbp-24], 0
+        jmp     .L71
+.L73:
+        mov     rax, QWORD PTR [rbp-24]
+        add     rax, OFFSET FLAT:auxiliary
+        movzx   eax, BYTE PTR [rax]
+        lea     rcx, [rbp-140]
+        mov     rdx, QWORD PTR [rbp-24]
+        add     rdx, rcx
+        mov     BYTE PTR [rdx], al
+        add     QWORD PTR [rbp-24], 1
+.L71:
+        cmp     QWORD PTR [rbp-24], 98
+        ja      .L72
+        lea     rdx, [rbp-140]
+        mov     rax, QWORD PTR [rbp-24]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        test    al, al
+        jne     .L73
+.L72:
+        lea     rdx, [rbp-140]
+        mov     rax, QWORD PTR [rbp-24]
+        add     rax, rdx
+        mov     BYTE PTR [rax], 0
+        movzx   eax, BYTE PTR [rbp-140]
+        cmp     al, 59
+        je      .L75
+        mov     edi, OFFSET FLAT:.LC15
+        call    puts
+        mov     edi, 1
+        call    exit
+.L75:
+        nop
+        leave
+        ret
+.LC16:
+        .string "Error sem\303\241ntico: La variable '%s' no est\303\241 declarada.\n"
+.LC17:
+        .string "#$&%;"
+operation(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >):
+        push    rbp
+        mov     rbp, rsp
+        push    rbx
+        sub     rsp, 232
+        mov     QWORD PTR [rbp-232], rdi
+        lea     rax, [rbp-192]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string() [complete object constructor]
+        mov     DWORD PTR [rbp-32], 0
+        jmp     .L77
+.L99:
+        mov     DWORD PTR [rbp-32], 0
+        mov     DWORD PTR [rbp-36], 0
+        mov     eax, DWORD PTR [rbp-32]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-232]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator[](unsigned long)
+        movzx   eax, BYTE PTR [rax]
+        movsx   eax, al
+        sub     eax, 48
+        cmp     eax, 9
+        setbe   al
+        movzx   eax, al
+        test    eax, eax
+        setne   al
+        test    al, al
+        je      .L82
+        jmp     .L79
+.L80:
+        mov     eax, DWORD PTR [rbp-32]
+        lea     edx, [rax+1]
+        mov     DWORD PTR [rbp-32], edx
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-232]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator[](unsigned long)
+        movzx   edx, BYTE PTR [rax]
+        mov     eax, DWORD PTR [rbp-36]
+        lea     ecx, [rax+1]
+        mov     DWORD PTR [rbp-36], ecx
+        cdqe
+        mov     BYTE PTR [rbp-197+rax], dl
+.L79:
+        mov     eax, DWORD PTR [rbp-32]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-232]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator[](unsigned long)
+        movzx   eax, BYTE PTR [rax]
+        movsx   eax, al
+        sub     eax, 48
+        cmp     eax, 9
+        setbe   al
+        movzx   eax, al
+        test    eax, eax
+        setne   al
+        test    al, al
+        jne     .L80
+        mov     eax, DWORD PTR [rbp-36]
+        cdqe
+        mov     BYTE PTR [rbp-197+rax], 0
+        lea     rax, [rbp-197]
+        mov     rdi, rax
+        call    atoi
+        mov     DWORD PTR [rbp-20], eax
+        jmp     .L81
+.L83:
+        mov     eax, DWORD PTR [rbp-32]
+        lea     edx, [rax+1]
+        mov     DWORD PTR [rbp-32], edx
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-232]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator[](unsigned long)
+        movzx   edx, BYTE PTR [rax]
+        mov     eax, DWORD PTR [rbp-36]
+        lea     ecx, [rax+1]
+        mov     DWORD PTR [rbp-36], ecx
+        cdqe
+        mov     BYTE PTR [rbp-224+rax], dl
+.L82:
+        mov     eax, DWORD PTR [rbp-32]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-232]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator[](unsigned long)
+        movzx   eax, BYTE PTR [rax]
+        movsx   eax, al
+        mov     esi, eax
+        mov     edi, OFFSET FLAT:.LC12
+        call    strchr
+        test    rax, rax
+        sete    al
+        test    al, al
+        jne     .L83
+        mov     eax, DWORD PTR [rbp-36]
+        cdqe
+        mov     BYTE PTR [rbp-224+rax], 0
+        lea     rax, [rbp-224]
+        mov     rdi, rax
+        call    find_symbol(char const*)
+        mov     QWORD PTR [rbp-48], rax
+        cmp     QWORD PTR [rbp-48], 0
+        je      .L84
+        mov     rax, QWORD PTR [rbp-48]
+        mov     eax, DWORD PTR [rax+104]
+        mov     DWORD PTR [rbp-20], eax
+        jmp     .L81
+.L84:
+        lea     rax, [rbp-224]
+        mov     rsi, rax
+        mov     edi, OFFSET FLAT:.LC16
+        mov     eax, 0
+        call    printf
+        mov     edi, 1
+        call    exit
+.L81:
+        mov     DWORD PTR [rbp-36], 0
+        mov     eax, DWORD PTR [rbp-32]
+        lea     edx, [rax+1]
+        mov     DWORD PTR [rbp-32], edx
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-232]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator[](unsigned long)
+        movzx   eax, BYTE PTR [rax]
+        mov     BYTE PTR [rbp-49], al
+        movsx   eax, BYTE PTR [rbp-49]
+        mov     esi, eax
+        mov     edi, OFFSET FLAT:.LC12
+        call    strchr
+        test    rax, rax
+        jne     .L85
+        mov     ebx, DWORD PTR [rbp-28]
+        jmp     .L86
+.L85:
+        mov     eax, DWORD PTR [rbp-32]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-232]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator[](unsigned long)
+        movzx   eax, BYTE PTR [rax]
+        movsx   eax, al
+        sub     eax, 48
+        cmp     eax, 9
+        setbe   al
+        movzx   eax, al
+        test    eax, eax
+        setne   al
+        test    al, al
+        je      .L91
+        jmp     .L88
+.L89:
+        mov     eax, DWORD PTR [rbp-32]
+        lea     edx, [rax+1]
+        mov     DWORD PTR [rbp-32], edx
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-232]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator[](unsigned long)
+        movzx   edx, BYTE PTR [rax]
+        mov     eax, DWORD PTR [rbp-36]
+        lea     ecx, [rax+1]
+        mov     DWORD PTR [rbp-36], ecx
+        cdqe
+        mov     BYTE PTR [rbp-202+rax], dl
+.L88:
+        mov     eax, DWORD PTR [rbp-32]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-232]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator[](unsigned long)
+        movzx   eax, BYTE PTR [rax]
+        movsx   eax, al
+        sub     eax, 48
+        cmp     eax, 9
+        setbe   al
+        movzx   eax, al
+        test    eax, eax
+        setne   al
+        test    al, al
+        jne     .L89
+        mov     eax, DWORD PTR [rbp-36]
+        cdqe
+        mov     BYTE PTR [rbp-202+rax], 0
+        lea     rax, [rbp-202]
+        mov     rdi, rax
+        call    atoi
+        mov     DWORD PTR [rbp-24], eax
+        jmp     .L90
+.L92:
+        mov     eax, DWORD PTR [rbp-32]
+        lea     edx, [rax+1]
+        mov     DWORD PTR [rbp-32], edx
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-232]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator[](unsigned long)
+        movzx   edx, BYTE PTR [rax]
+        mov     eax, DWORD PTR [rbp-36]
+        lea     ecx, [rax+1]
+        mov     DWORD PTR [rbp-36], ecx
+        cdqe
+        mov     BYTE PTR [rbp-224+rax], dl
+.L91:
+        mov     eax, DWORD PTR [rbp-32]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-232]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator[](unsigned long)
+        movzx   eax, BYTE PTR [rax]
+        movsx   eax, al
+        mov     esi, eax
+        mov     edi, OFFSET FLAT:.LC17
+        call    strchr
+        test    rax, rax
+        sete    al
+        test    al, al
+        jne     .L92
+        mov     eax, DWORD PTR [rbp-36]
+        cdqe
+        mov     BYTE PTR [rbp-224+rax], 0
+        lea     rax, [rbp-224]
+        mov     rdi, rax
+        call    find_symbol(char const*)
+        mov     QWORD PTR [rbp-64], rax
+        cmp     QWORD PTR [rbp-64], 0
+        je      .L93
+        mov     rax, QWORD PTR [rbp-64]
+        mov     eax, DWORD PTR [rax+104]
+        mov     DWORD PTR [rbp-24], eax
+        jmp     .L90
+.L93:
+        lea     rax, [rbp-224]
+        mov     rsi, rax
+        mov     edi, OFFSET FLAT:.LC16
+        mov     eax, 0
+        call    printf
+        mov     edi, 1
+        call    exit
+.L90:
+        mov     eax, DWORD PTR [rbp-32]
+        movsx   rdx, eax
+        lea     rax, [rbp-160]
+        mov     rsi, QWORD PTR [rbp-232]
+        mov     rcx, -1
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::substr(unsigned long, unsigned long) const
+        lea     rdx, [rbp-160]
+        lea     rax, [rbp-192]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator=(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&)
+        lea     rax, [rbp-160]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        movsx   eax, BYTE PTR [rbp-49]
+        cmp     eax, 38
+        je      .L94
+        cmp     eax, 38
+        jg      .L95
+        cmp     eax, 37
+        je      .L96
+        cmp     eax, 37
+        jg      .L95
+        cmp     eax, 35
+        je      .L97
+        cmp     eax, 36
+        je      .L98
+        jmp     .L95
+.L97:
+        mov     edx, DWORD PTR [rbp-20]
+        mov     eax, DWORD PTR [rbp-24]
+        add     eax, edx
+        mov     DWORD PTR [rbp-28], eax
+        jmp     .L95
+.L98:
+        mov     eax, DWORD PTR [rbp-20]
+        sub     eax, DWORD PTR [rbp-24]
+        mov     DWORD PTR [rbp-28], eax
+        jmp     .L95
+.L94:
+        mov     eax, DWORD PTR [rbp-20]
+        imul    eax, DWORD PTR [rbp-24]
+        mov     DWORD PTR [rbp-28], eax
+        jmp     .L95
+.L96:
+        mov     eax, DWORD PTR [rbp-20]
+        cdq
+        idiv    DWORD PTR [rbp-24]
+        mov     DWORD PTR [rbp-28], eax
+        nop
+.L95:
+        lea     rax, [rbp-96]
+        mov     edx, DWORD PTR [rbp-28]
+        mov     esi, edx
+        mov     rdi, rax
+        call    std::__cxx11::to_string(int)
+        lea     rax, [rbp-128]
+        lea     rdx, [rbp-192]
+        lea     rcx, [rbp-96]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+        lea     rdx, [rbp-128]
+        mov     rax, QWORD PTR [rbp-232]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator=(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&)
+        lea     rax, [rbp-128]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        lea     rax, [rbp-96]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        mov     DWORD PTR [rbp-32], 0
+        add     DWORD PTR [rbp-32], 1
+.L77:
+        mov     eax, DWORD PTR [rbp-32]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-232]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator[](unsigned long)
+        movzx   eax, BYTE PTR [rax]
+        test    al, al
+        setne   al
+        test    al, al
+        jne     .L99
+        mov     ebx, DWORD PTR [rbp-28]
+.L86:
+        lea     rax, [rbp-192]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        mov     eax, ebx
+        jmp     .L105
+        mov     rbx, rax
+        lea     rax, [rbp-96]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        jmp     .L102
+        mov     rbx, rax
+.L102:
+        lea     rax, [rbp-192]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        mov     rax, rbx
+        mov     rdi, rax
+        call    _Unwind_Resume
+.L105:
+        mov     rbx, QWORD PTR [rbp-8]
+        leave
+        ret
+sacar[abi:cxx11](char const*):
+        push    rbp
+        mov     rbp, rsp
+        push    rbx
+        sub     rsp, 40
+        mov     QWORD PTR [rbp-40], rdi
+        mov     QWORD PTR [rbp-48], rsi
+        mov     rax, QWORD PTR [rbp-40]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string() [complete object constructor]
+        mov     DWORD PTR [rbp-20], 0
+        jmp     .L107
+.L108:
+        mov     eax, DWORD PTR [rbp-20]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-48]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        movsx   edx, al
+        mov     rax, QWORD PTR [rbp-40]
+        mov     esi, edx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator+=(char)
+        add     DWORD PTR [rbp-20], 1
+.L107:
+        mov     eax, DWORD PTR [rbp-20]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-48]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        test    al, al
+        jne     .L108
+        jmp     .L112
+        mov     rbx, rax
+        mov     rax, QWORD PTR [rbp-40]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        mov     rax, rbx
+        mov     rdi, rax
+        call    _Unwind_Resume
+.L112:
+        mov     rax, QWORD PTR [rbp-40]
+        mov     rbx, QWORD PTR [rbp-8]
+        leave
+        ret
+print:
+        .zero   4
+.LC18:
+        .string "Error de sintaxis: Se esperaba un ';'."
+.LC19:
+        .string "<>="
+.LC20:
+        .string "#$%&"
+.LC21:
+        .string "Error de sintaxis en expresi\303\263n."
+.LC22:
+        .string "Error de sintaxis: Se esperaba un n\303\272mero o identificador."
+parse_expression(char const*, int*):
+        push    rbp
+        mov     rbp, rsp
+        push    rbx
+        sub     rsp, 552
+        mov     QWORD PTR [rbp-440], rdi
+        mov     QWORD PTR [rbp-448], rsi
+        lea     rax, [rbp-368]
+        mov     rdx, QWORD PTR [rbp-448]
+        mov     rcx, QWORD PTR [rbp-440]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        lea     rax, [rbp-400]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string() [complete object constructor]
+        mov     eax, DWORD PTR [rbp-368]
+        mov     DWORD PTR [rbp-76], eax
+        mov     BYTE PTR [rbp-77], 1
+        mov     eax, DWORD PTR [rbp-368]
+        cmp     eax, 2
+        je      .L114
+        mov     eax, DWORD PTR [rbp-368]
+        cmp     eax, 1
+        jne     .L115
+.L114:
+        mov     eax, DWORD PTR [rbp-368]
+        cmp     eax, 1
+        jne     .L116
+        lea     rax, [rbp-368]
+        add     rax, 4
+        mov     rdi, rax
+        call    find_symbol(char const*)
+        test    rax, rax
+        sete    al
+        test    al, al
+        je      .L117
+        lea     rax, [rbp-368]
+        add     rax, 4
+        mov     rsi, rax
+        mov     edi, OFFSET FLAT:.LC16
+        mov     eax, 0
+        call    printf
+        mov     edi, 1
+        call    exit
+.L117:
+        mov     DWORD PTR [rbp-24], 0
+        jmp     .L118
+.L119:
+        mov     eax, DWORD PTR [rbp-24]
+        cdqe
+        movzx   edx, BYTE PTR [rbp-364+rax]
+        mov     eax, DWORD PTR [rbp-24]
+        cdqe
+        mov     BYTE PTR [rbp-432+rax], dl
+        add     DWORD PTR [rbp-24], 1
+.L118:
+        mov     eax, DWORD PTR [rbp-24]
+        cdqe
+        movzx   eax, BYTE PTR [rbp-364+rax]
+        test    al, al
+        jne     .L119
+        mov     eax, DWORD PTR [rbp-24]
+        cdqe
+        mov     BYTE PTR [rbp-432+rax], 0
+        lea     rax, [rbp-432]
+        mov     rdi, rax
+        call    find_symbol(char const*)
+        mov     QWORD PTR [rbp-88], rax
+        mov     rax, QWORD PTR [rbp-88]
+        mov     eax, DWORD PTR [rax+104]
+        mov     DWORD PTR [rbp-20], eax
+.L116:
+        mov     eax, DWORD PTR [rbp-368]
+        cmp     eax, 2
+        jne     .L120
+        lea     rax, [rbp-368]
+        add     rax, 4
+        mov     rdi, rax
+        call    atoi
+        mov     DWORD PTR [rbp-20], eax
+.L120:
+        lea     rax, [rbp-256]
+        lea     rdx, [rbp-368]
+        add     rdx, 4
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    sacar[abi:cxx11](char const*)
+        lea     rdx, [rbp-256]
+        lea     rax, [rbp-400]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator+=(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+        lea     rax, [rbp-256]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        lea     rax, [rbp-560]
+        mov     rdx, QWORD PTR [rbp-448]
+        mov     rcx, QWORD PTR [rbp-440]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        mov     rax, QWORD PTR [rbp-560]
+        mov     rdx, QWORD PTR [rbp-552]
+        mov     QWORD PTR [rbp-368], rax
+        mov     QWORD PTR [rbp-360], rdx
+        mov     rax, QWORD PTR [rbp-544]
+        mov     rdx, QWORD PTR [rbp-536]
+        mov     QWORD PTR [rbp-352], rax
+        mov     QWORD PTR [rbp-344], rdx
+        mov     rax, QWORD PTR [rbp-528]
+        mov     rdx, QWORD PTR [rbp-520]
+        mov     QWORD PTR [rbp-336], rax
+        mov     QWORD PTR [rbp-328], rdx
+        mov     rax, QWORD PTR [rbp-512]
+        mov     rdx, QWORD PTR [rbp-504]
+        mov     QWORD PTR [rbp-320], rax
+        mov     QWORD PTR [rbp-312], rdx
+        mov     rax, QWORD PTR [rbp-496]
+        mov     rdx, QWORD PTR [rbp-488]
+        mov     QWORD PTR [rbp-304], rax
+        mov     QWORD PTR [rbp-296], rdx
+        mov     rax, QWORD PTR [rbp-480]
+        mov     rdx, QWORD PTR [rbp-472]
+        mov     QWORD PTR [rbp-288], rax
+        mov     QWORD PTR [rbp-280], rdx
+        mov     rax, QWORD PTR [rbp-464]
+        mov     QWORD PTR [rbp-272], rax
+        mov     eax, DWORD PTR [rbp-368]
+        cmp     eax, 3
+        je      .L121
+        movzx   eax, BYTE PTR [rbp-364]
+        cmp     al, 59
+        je      .L121
+        movzx   eax, BYTE PTR check_2[rip]
+        test    al, al
+        je      .L121
+        mov     edi, OFFSET FLAT:.LC18
+        call    puts
+        mov     edi, 1
+        call    exit
+.L121:
+        movzx   eax, BYTE PTR [rbp-364]
+        movsx   eax, al
+        mov     esi, eax
+        mov     edi, OFFSET FLAT:.LC19
+        call    strchr
+        test    rax, rax
+        je      .L122
+        movzx   eax, BYTE PTR check_2[rip]
+        xor     eax, 1
+        test    al, al
+        je      .L122
+        mov     QWORD PTR [rbp-32], 0
+        jmp     .L123
+.L125:
+        lea     rdx, [rbp-364]
+        mov     rax, QWORD PTR [rbp-32]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        mov     rdx, QWORD PTR [rbp-32]
+        add     rdx, OFFSET FLAT:auxiliary
+        mov     BYTE PTR [rdx], al
+        add     QWORD PTR [rbp-32], 1
+.L123:
+        lea     rax, [rbp-368]
+        add     rax, 4
+        mov     rdi, rax
+        call    strlen
+        cmp     QWORD PTR [rbp-32], rax
+        jnb     .L124
+        cmp     QWORD PTR [rbp-32], 98
+        jbe     .L125
+.L124:
+        mov     rax, QWORD PTR [rbp-32]
+        add     rax, OFFSET FLAT:auxiliary
+        mov     BYTE PTR [rax], 0
+        mov     ebx, DWORD PTR [rbp-20]
+        jmp     .L126
+.L122:
+        movzx   eax, BYTE PTR [rbp-364]
+        cmp     al, 59
+        jne     .L127
+        movzx   eax, BYTE PTR check_2[rip]
+        xor     eax, 1
+        test    al, al
+        je      .L127
+        mov     QWORD PTR [rbp-40], 0
+        jmp     .L128
+.L130:
+        lea     rdx, [rbp-364]
+        mov     rax, QWORD PTR [rbp-40]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        mov     rdx, QWORD PTR [rbp-40]
+        add     rdx, OFFSET FLAT:auxiliary
+        mov     BYTE PTR [rdx], al
+        add     QWORD PTR [rbp-40], 1
+.L128:
+        lea     rax, [rbp-368]
+        add     rax, 4
+        mov     rdi, rax
+        call    strlen
+        cmp     QWORD PTR [rbp-40], rax
+        jnb     .L129
+        cmp     QWORD PTR [rbp-40], 98
+        jbe     .L130
+.L129:
+        mov     rax, QWORD PTR [rbp-40]
+        add     rax, OFFSET FLAT:auxiliary
+        mov     BYTE PTR [rax], 0
+        mov     ebx, DWORD PTR [rbp-20]
+        jmp     .L126
+.L127:
+        cmp     DWORD PTR [rbp-76], 1
+        jne     .L131
+        movzx   eax, BYTE PTR check_2[rip]
+        xor     eax, 1
+        test    al, al
+        je      .L131
+        movzx   eax, BYTE PTR [rbp-364]
+        cmp     al, 41
+        jne     .L131
+        lea     rax, [rbp-432]
+        mov     rdi, rax
+        call    find_symbol(char const*)
+        mov     QWORD PTR [rbp-96], rax
+        mov     QWORD PTR [rbp-48], 0
+        jmp     .L132
+.L134:
+        lea     rdx, [rbp-364]
+        mov     rax, QWORD PTR [rbp-48]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        mov     rdx, QWORD PTR [rbp-48]
+        add     rdx, OFFSET FLAT:auxiliary
+        mov     BYTE PTR [rdx], al
+        add     QWORD PTR [rbp-48], 1
+.L132:
+        lea     rax, [rbp-368]
+        add     rax, 4
+        mov     rdi, rax
+        call    strlen
+        cmp     QWORD PTR [rbp-48], rax
+        jnb     .L133
+        cmp     QWORD PTR [rbp-48], 98
+        jbe     .L134
+.L133:
+        mov     rax, QWORD PTR [rbp-48]
+        add     rax, OFFSET FLAT:auxiliary
+        mov     BYTE PTR [rax], 0
+        mov     rax, QWORD PTR [rbp-96]
+        mov     ebx, DWORD PTR [rax+104]
+        jmp     .L126
+.L131:
+        cmp     DWORD PTR [rbp-76], 2
+        jne     .L135
+        movzx   eax, BYTE PTR check_2[rip]
+        xor     eax, 1
+        test    al, al
+        je      .L135
+        movzx   eax, BYTE PTR [rbp-364]
+        movsx   eax, al
+        mov     esi, eax
+        mov     edi, OFFSET FLAT:.LC20
+        call    strchr
+        test    rax, rax
+        jne     .L135
+        mov     QWORD PTR [rbp-56], 0
+        jmp     .L136
+.L138:
+        lea     rdx, [rbp-364]
+        mov     rax, QWORD PTR [rbp-56]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        mov     rdx, QWORD PTR [rbp-56]
+        add     rdx, OFFSET FLAT:auxiliary
+        mov     BYTE PTR [rdx], al
+        add     QWORD PTR [rbp-56], 1
+.L136:
+        lea     rax, [rbp-368]
+        add     rax, 4
+        mov     rdi, rax
+        call    strlen
+        cmp     QWORD PTR [rbp-56], rax
+        jnb     .L137
+        cmp     QWORD PTR [rbp-56], 98
+        jbe     .L138
+.L137:
+        mov     rax, QWORD PTR [rbp-56]
+        add     rax, OFFSET FLAT:auxiliary
+        mov     BYTE PTR [rax], 0
+        mov     ebx, DWORD PTR [rbp-20]
+        jmp     .L126
+.L135:
+        cmp     DWORD PTR [rbp-76], 2
+        jne     .L139
+        movzx   eax, BYTE PTR [rbp-364]
+        cmp     al, 59
+        jne     .L139
+        mov     QWORD PTR [rbp-64], 0
+        jmp     .L140
+.L142:
+        lea     rdx, [rbp-364]
+        mov     rax, QWORD PTR [rbp-64]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        mov     rdx, QWORD PTR [rbp-64]
+        add     rdx, OFFSET FLAT:auxiliary
+        mov     BYTE PTR [rdx], al
+        add     QWORD PTR [rbp-64], 1
+.L140:
+        lea     rax, [rbp-368]
+        add     rax, 4
+        mov     rdi, rax
+        call    strlen
+        cmp     QWORD PTR [rbp-64], rax
+        jnb     .L141
+        cmp     QWORD PTR [rbp-64], 98
+        jbe     .L142
+.L141:
+        mov     rax, QWORD PTR [rbp-64]
+        add     rax, OFFSET FLAT:auxiliary
+        mov     BYTE PTR [rax], 0
+        mov     ebx, DWORD PTR [rbp-20]
+        jmp     .L126
+.L139:
+        lea     rax, [rbp-224]
+        lea     rdx, [rbp-368]
+        add     rdx, 4
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    sacar[abi:cxx11](char const*)
+        lea     rdx, [rbp-224]
+        lea     rax, [rbp-400]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator+=(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+        lea     rax, [rbp-224]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        jmp     .L143
+.L148:
+        lea     rax, [rbp-560]
+        mov     rdx, QWORD PTR [rbp-448]
+        mov     rcx, QWORD PTR [rbp-440]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        mov     rax, QWORD PTR [rbp-560]
+        mov     rdx, QWORD PTR [rbp-552]
+        mov     QWORD PTR [rbp-368], rax
+        mov     QWORD PTR [rbp-360], rdx
+        mov     rax, QWORD PTR [rbp-544]
+        mov     rdx, QWORD PTR [rbp-536]
+        mov     QWORD PTR [rbp-352], rax
+        mov     QWORD PTR [rbp-344], rdx
+        mov     rax, QWORD PTR [rbp-528]
+        mov     rdx, QWORD PTR [rbp-520]
+        mov     QWORD PTR [rbp-336], rax
+        mov     QWORD PTR [rbp-328], rdx
+        mov     rax, QWORD PTR [rbp-512]
+        mov     rdx, QWORD PTR [rbp-504]
+        mov     QWORD PTR [rbp-320], rax
+        mov     QWORD PTR [rbp-312], rdx
+        mov     rax, QWORD PTR [rbp-496]
+        mov     rdx, QWORD PTR [rbp-488]
+        mov     QWORD PTR [rbp-304], rax
+        mov     QWORD PTR [rbp-296], rdx
+        mov     rax, QWORD PTR [rbp-480]
+        mov     rdx, QWORD PTR [rbp-472]
+        mov     QWORD PTR [rbp-288], rax
+        mov     QWORD PTR [rbp-280], rdx
+        mov     rax, QWORD PTR [rbp-464]
+        mov     QWORD PTR [rbp-272], rax
+        mov     eax, DWORD PTR [rbp-368]
+        cmp     eax, 2
+        je      .L144
+        mov     eax, DWORD PTR [rbp-368]
+        cmp     eax, 1
+        je      .L144
+        mov     edi, OFFSET FLAT:.LC21
+        call    puts
+        mov     edi, 1
+        call    exit
+.L144:
+        mov     eax, DWORD PTR [rbp-368]
+        cmp     eax, 1
+        jne     .L145
+        lea     rax, [rbp-368]
+        add     rax, 4
+        mov     rdi, rax
+        call    find_symbol(char const*)
+        test    rax, rax
+        jne     .L145
+        mov     eax, 1
+        jmp     .L146
+.L145:
+        mov     eax, 0
+.L146:
+        test    al, al
+        je      .L147
+        lea     rax, [rbp-368]
+        add     rax, 4
+        mov     rsi, rax
+        mov     edi, OFFSET FLAT:.LC16
+        mov     eax, 0
+        call    printf
+        mov     edi, 1
+        call    exit
+.L147:
+        lea     rax, [rbp-192]
+        lea     rdx, [rbp-368]
+        add     rdx, 4
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    sacar[abi:cxx11](char const*)
+        lea     rdx, [rbp-192]
+        lea     rax, [rbp-400]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator+=(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+        lea     rax, [rbp-192]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        mov     rax, QWORD PTR [rbp-448]
+        mov     eax, DWORD PTR [rax]
+        mov     DWORD PTR print[rip], eax
+        lea     rax, [rbp-560]
+        mov     rdx, QWORD PTR [rbp-448]
+        mov     rcx, QWORD PTR [rbp-440]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        mov     rax, QWORD PTR [rbp-560]
+        mov     rdx, QWORD PTR [rbp-552]
+        mov     QWORD PTR [rbp-368], rax
+        mov     QWORD PTR [rbp-360], rdx
+        mov     rax, QWORD PTR [rbp-544]
+        mov     rdx, QWORD PTR [rbp-536]
+        mov     QWORD PTR [rbp-352], rax
+        mov     QWORD PTR [rbp-344], rdx
+        mov     rax, QWORD PTR [rbp-528]
+        mov     rdx, QWORD PTR [rbp-520]
+        mov     QWORD PTR [rbp-336], rax
+        mov     QWORD PTR [rbp-328], rdx
+        mov     rax, QWORD PTR [rbp-512]
+        mov     rdx, QWORD PTR [rbp-504]
+        mov     QWORD PTR [rbp-320], rax
+        mov     QWORD PTR [rbp-312], rdx
+        mov     rax, QWORD PTR [rbp-496]
+        mov     rdx, QWORD PTR [rbp-488]
+        mov     QWORD PTR [rbp-304], rax
+        mov     QWORD PTR [rbp-296], rdx
+        mov     rax, QWORD PTR [rbp-480]
+        mov     rdx, QWORD PTR [rbp-472]
+        mov     QWORD PTR [rbp-288], rax
+        mov     QWORD PTR [rbp-280], rdx
+        mov     rax, QWORD PTR [rbp-464]
+        mov     QWORD PTR [rbp-272], rax
+        lea     rax, [rbp-160]
+        lea     rdx, [rbp-368]
+        add     rdx, 4
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    sacar[abi:cxx11](char const*)
+        lea     rdx, [rbp-160]
+        lea     rax, [rbp-400]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator+=(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+        lea     rax, [rbp-160]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+.L143:
+        mov     eax, DWORD PTR [rbp-368]
+        cmp     eax, 3
+        je      .L148
+        jmp     .L167
+.L115:
+        mov     edi, OFFSET FLAT:.LC22
+        call    puts
+        mov     edi, 1
+        call    exit
+.L167:
+        cmp     BYTE PTR [rbp-77], 0
+        je      .L150
+        lea     rdx, [rbp-400]
+        lea     rax, [rbp-128]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [complete object constructor]
+        lea     rax, [rbp-128]
+        mov     rdi, rax
+        call    operation(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >)
+        mov     DWORD PTR [rbp-20], eax
+        lea     rax, [rbp-128]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        mov     QWORD PTR [rbp-72], 0
+        jmp     .L151
+.L153:
+        lea     rdx, [rbp-364]
+        mov     rax, QWORD PTR [rbp-72]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        mov     rdx, QWORD PTR [rbp-72]
+        add     rdx, OFFSET FLAT:auxiliary
+        mov     BYTE PTR [rdx], al
+        add     QWORD PTR [rbp-72], 1
+.L151:
+        lea     rax, [rbp-368]
+        add     rax, 4
+        mov     rdi, rax
+        call    strlen
+        cmp     QWORD PTR [rbp-72], rax
+        jnb     .L152
+        cmp     QWORD PTR [rbp-72], 98
+        jbe     .L153
+.L152:
+        mov     rax, QWORD PTR [rbp-72]
+        add     rax, OFFSET FLAT:auxiliary
+        mov     BYTE PTR [rax], 0
+        mov     ebx, DWORD PTR [rbp-20]
+        jmp     .L126
+.L150:
+        mov     ebx, 0
+.L126:
+        lea     rax, [rbp-400]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        mov     eax, ebx
+        jmp     .L168
+        mov     rbx, rax
+        lea     rax, [rbp-256]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        jmp     .L156
+        mov     rbx, rax
+        lea     rax, [rbp-224]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        jmp     .L156
+        mov     rbx, rax
+        lea     rax, [rbp-192]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        jmp     .L156
+        mov     rbx, rax
+        lea     rax, [rbp-160]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        jmp     .L156
+        mov     rbx, rax
+        lea     rax, [rbp-128]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        jmp     .L156
+        mov     rbx, rax
+.L156:
+        lea     rax, [rbp-400]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        mov     rax, rbx
+        mov     rdi, rax
+        call    _Unwind_Resume
+.L168:
+        mov     rbx, QWORD PTR [rbp-8]
+        leave
+        ret
+.LC23:
+        .string "Error de sintaxis: Se esperaba un s\357\277\275mbolo '='"
+.LC24:
+        .string "Error de sintaxis: Se esperaba ';' despu\357\277\275s de la condici\357\277\275n."
+parse_identifier(char const*, int*):
+        push    rbp
+        mov     rbp, rsp
+        sub     rsp, 144
+        mov     QWORD PTR [rbp-136], rdi
+        mov     QWORD PTR [rbp-144], rsi
+        lea     rax, [rbp-128]
+        mov     rdx, QWORD PTR [rbp-144]
+        mov     rcx, QWORD PTR [rbp-136]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        movzx   eax, BYTE PTR [rbp-124]
+        cmp     al, 61
+        je      .L170
+        mov     edi, OFFSET FLAT:.LC23
+        mov     eax, 0
+        call    printf
+        mov     edi, 1
+        call    exit
+.L170:
+        mov     rdx, QWORD PTR [rbp-144]
+        mov     rax, QWORD PTR [rbp-136]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    parse_expression(char const*, int*)
+        mov     DWORD PTR [rbp-12], eax
+        mov     edi, OFFSET FLAT:temporal[abi:cxx11]
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::c_str() const
+        mov     rdx, rax
+        mov     eax, DWORD PTR [rbp-12]
+        mov     esi, eax
+        mov     rdi, rdx
+        call    add_value(char const*, int)
+        mov     QWORD PTR [rbp-8], 0
+        jmp     .L171
+.L173:
+        mov     rax, QWORD PTR [rbp-8]
+        add     rax, OFFSET FLAT:auxiliary
+        movzx   eax, BYTE PTR [rax]
+        lea     rcx, [rbp-124]
+        mov     rdx, QWORD PTR [rbp-8]
+        add     rdx, rcx
+        mov     BYTE PTR [rdx], al
+        add     QWORD PTR [rbp-8], 1
+.L171:
+        cmp     QWORD PTR [rbp-8], 98
+        ja      .L172
+        lea     rdx, [rbp-124]
+        mov     rax, QWORD PTR [rbp-8]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        test    al, al
+        jne     .L173
+.L172:
+        lea     rdx, [rbp-124]
+        mov     rax, QWORD PTR [rbp-8]
+        add     rax, rdx
+        mov     BYTE PTR [rax], 0
+        movzx   eax, BYTE PTR [rbp-124]
+        cmp     al, 59
+        je      .L175
+        mov     edi, OFFSET FLAT:.LC24
+        call    puts
+        mov     edi, 1
+        call    exit
+.L175:
+        nop
+        leave
+        ret
+.LC25:
+        .string "Error de sintaxis: se esperaba 'mauricioemilianovelazquezcaudillo'."
+parse_keys(char const*, int*):
+        push    rbp
+        mov     rbp, rsp
+        sub     rsp, 240
+        mov     QWORD PTR [rbp-120], rdi
+        mov     QWORD PTR [rbp-128], rsi
+        lea     rax, [rbp-112]
+        mov     rdx, QWORD PTR [rbp-128]
+        mov     rcx, QWORD PTR [rbp-120]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        lea     rax, [rbp-112]
+        add     rax, 4
+        mov     esi, OFFSET FLAT:.LC7
+        mov     rdi, rax
+        call    strcmp
+        test    eax, eax
+        je      .L177
+        mov     edi, OFFSET FLAT:.LC25
+        call    puts
+        mov     edi, 1
+        call    exit
+.L177:
+        mov     rax, QWORD PTR [rbp-128]
+        mov     eax, DWORD PTR [rax]
+        mov     DWORD PTR [rbp-4], eax
+        lea     rax, [rbp-240]
+        mov     rdx, QWORD PTR [rbp-128]
+        mov     rcx, QWORD PTR [rbp-120]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        mov     rax, QWORD PTR [rbp-240]
+        mov     rdx, QWORD PTR [rbp-232]
+        mov     QWORD PTR [rbp-112], rax
+        mov     QWORD PTR [rbp-104], rdx
+        mov     rax, QWORD PTR [rbp-224]
+        mov     rdx, QWORD PTR [rbp-216]
+        mov     QWORD PTR [rbp-96], rax
+        mov     QWORD PTR [rbp-88], rdx
+        mov     rax, QWORD PTR [rbp-208]
+        mov     rdx, QWORD PTR [rbp-200]
+        mov     QWORD PTR [rbp-80], rax
+        mov     QWORD PTR [rbp-72], rdx
+        mov     rax, QWORD PTR [rbp-192]
+        mov     rdx, QWORD PTR [rbp-184]
+        mov     QWORD PTR [rbp-64], rax
+        mov     QWORD PTR [rbp-56], rdx
+        mov     rax, QWORD PTR [rbp-176]
+        mov     rdx, QWORD PTR [rbp-168]
+        mov     QWORD PTR [rbp-48], rax
+        mov     QWORD PTR [rbp-40], rdx
+        mov     rax, QWORD PTR [rbp-160]
+        mov     rdx, QWORD PTR [rbp-152]
+        mov     QWORD PTR [rbp-32], rax
+        mov     QWORD PTR [rbp-24], rdx
+        mov     rax, QWORD PTR [rbp-144]
+        mov     QWORD PTR [rbp-16], rax
+        jmp     .L178
+.L180:
+        movzx   eax, BYTE PTR check[rip]
+        test    al, al
+        je      .L179
+        mov     rax, QWORD PTR [rbp-128]
+        mov     edx, DWORD PTR [rbp-4]
+        mov     DWORD PTR [rax], edx
+        mov     rdx, QWORD PTR [rbp-128]
+        mov     rax, QWORD PTR [rbp-120]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    parse_statement(char const*, int*)
+        mov     rax, QWORD PTR [rbp-128]
+        mov     eax, DWORD PTR [rax]
+        mov     DWORD PTR [rbp-4], eax
+.L179:
+        lea     rax, [rbp-240]
+        mov     rdx, QWORD PTR [rbp-128]
+        mov     rcx, QWORD PTR [rbp-120]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        mov     rax, QWORD PTR [rbp-240]
+        mov     rdx, QWORD PTR [rbp-232]
+        mov     QWORD PTR [rbp-112], rax
+        mov     QWORD PTR [rbp-104], rdx
+        mov     rax, QWORD PTR [rbp-224]
+        mov     rdx, QWORD PTR [rbp-216]
+        mov     QWORD PTR [rbp-96], rax
+        mov     QWORD PTR [rbp-88], rdx
+        mov     rax, QWORD PTR [rbp-208]
+        mov     rdx, QWORD PTR [rbp-200]
+        mov     QWORD PTR [rbp-80], rax
+        mov     QWORD PTR [rbp-72], rdx
+        mov     rax, QWORD PTR [rbp-192]
+        mov     rdx, QWORD PTR [rbp-184]
+        mov     QWORD PTR [rbp-64], rax
+        mov     QWORD PTR [rbp-56], rdx
+        mov     rax, QWORD PTR [rbp-176]
+        mov     rdx, QWORD PTR [rbp-168]
+        mov     QWORD PTR [rbp-48], rax
+        mov     QWORD PTR [rbp-40], rdx
+        mov     rax, QWORD PTR [rbp-160]
+        mov     rdx, QWORD PTR [rbp-152]
+        mov     QWORD PTR [rbp-32], rax
+        mov     QWORD PTR [rbp-24], rdx
+        mov     rax, QWORD PTR [rbp-144]
+        mov     QWORD PTR [rbp-16], rax
+        movzx   eax, BYTE PTR [rbp-108]
+        test    al, al
+        jne     .L178
+        mov     edi, OFFSET FLAT:.LC25
+        call    puts
+        mov     edi, 1
+        call    exit
+.L178:
+        lea     rax, [rbp-112]
+        add     rax, 4
+        mov     esi, OFFSET FLAT:.LC7
+        mov     rdi, rax
+        call    strcmp
+        test    eax, eax
+        jne     .L180
+        mov     BYTE PTR check[rip], 1
+        nop
+        leave
+        ret
+if_solve(int, int, char):
+        push    rbp
+        mov     rbp, rsp
+        mov     DWORD PTR [rbp-4], edi
+        mov     DWORD PTR [rbp-8], esi
+        mov     eax, edx
+        mov     BYTE PTR [rbp-12], al
+        movsx   eax, BYTE PTR [rbp-12]
+        cmp     eax, 62
+        je      .L182
+        cmp     eax, 62
+        jg      .L183
+        cmp     eax, 60
+        je      .L184
+        cmp     eax, 61
+        jne     .L183
+        mov     eax, DWORD PTR [rbp-4]
+        cmp     eax, DWORD PTR [rbp-8]
+        sete    al
+        jmp     .L185
+.L182:
+        mov     eax, DWORD PTR [rbp-4]
+        cmp     eax, DWORD PTR [rbp-8]
+        setg    al
+        jmp     .L185
+.L184:
+        mov     eax, DWORD PTR [rbp-4]
+        cmp     eax, DWORD PTR [rbp-8]
+        setl    al
+        jmp     .L185
+.L183:
+        ud2
+.L185:
+        pop     rbp
+        ret
+.LC26:
+        .string "Error de sintaxis: Se esperaba '('."
+.LC27:
+        .string "=<>"
+.LC28:
+        .string "Error de sintaxis: Se esperaba '=<>'."
+.LC29:
+        .string "Error de sintaxis: Se esperaba ')'."
+parse_if_statement(char const*, int*):
+        push    rbp
+        mov     rbp, rsp
+        sub     rsp, 176
+        mov     QWORD PTR [rbp-168], rdi
+        mov     QWORD PTR [rbp-176], rsi
+        lea     rax, [rbp-144]
+        mov     rdx, QWORD PTR [rbp-176]
+        mov     rcx, QWORD PTR [rbp-168]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        mov     BYTE PTR check_2[rip], 0
+        movzx   eax, BYTE PTR [rbp-140]
+        cmp     al, 40
+        je      .L187
+        mov     edi, OFFSET FLAT:.LC26
+        call    puts
+        mov     edi, 1
+        call    exit
+.L187:
+        mov     rdx, QWORD PTR [rbp-176]
+        mov     rax, QWORD PTR [rbp-168]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    parse_expression(char const*, int*)
+        mov     DWORD PTR [rbp-20], eax
+        mov     QWORD PTR [rbp-8], 0
+        jmp     .L188
+.L190:
+        mov     rax, QWORD PTR [rbp-8]
+        add     rax, OFFSET FLAT:auxiliary
+        movzx   eax, BYTE PTR [rax]
+        lea     rcx, [rbp-140]
+        mov     rdx, QWORD PTR [rbp-8]
+        add     rdx, rcx
+        mov     BYTE PTR [rdx], al
+        mov     rax, QWORD PTR [rbp-8]
+        add     rax, OFFSET FLAT:auxiliary
+        movzx   eax, BYTE PTR [rax]
+        lea     rcx, [rbp-146]
+        mov     rdx, QWORD PTR [rbp-8]
+        add     rdx, rcx
+        mov     BYTE PTR [rdx], al
+        add     QWORD PTR [rbp-8], 1
+.L188:
+        cmp     QWORD PTR [rbp-8], 98
+        ja      .L189
+        lea     rdx, [rbp-140]
+        mov     rax, QWORD PTR [rbp-8]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        test    al, al
+        jne     .L190
+.L189:
+        lea     rdx, [rbp-140]
+        mov     rax, QWORD PTR [rbp-8]
+        add     rax, rdx
+        mov     BYTE PTR [rax], 0
+        movzx   eax, BYTE PTR [rbp-140]
+        movsx   eax, al
+        mov     esi, eax
+        mov     edi, OFFSET FLAT:.LC27
+        call    strchr
+        test    rax, rax
+        jne     .L191
+        mov     edi, OFFSET FLAT:.LC28
+        call    puts
+        mov     edi, 1
+        call    exit
+.L191:
+        mov     rdx, QWORD PTR [rbp-176]
+        mov     rax, QWORD PTR [rbp-168]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    parse_expression(char const*, int*)
+        mov     DWORD PTR [rbp-24], eax
+        movzx   eax, BYTE PTR [rbp-146]
+        movsx   edx, al
+        mov     ecx, DWORD PTR [rbp-24]
+        mov     eax, DWORD PTR [rbp-20]
+        mov     esi, ecx
+        mov     edi, eax
+        call    if_solve(int, int, char)
+        mov     BYTE PTR check[rip], al
+        movzx   eax, BYTE PTR check[rip]
+        mov     BYTE PTR [rbp-25], al
+        mov     rax, QWORD PTR [rbp-8]
+        mov     QWORD PTR [rbp-16], rax
+        mov     QWORD PTR [rbp-16], 0
+        jmp     .L192
+.L194:
+        mov     rax, QWORD PTR [rbp-16]
+        add     rax, OFFSET FLAT:auxiliary
+        movzx   eax, BYTE PTR [rax]
+        lea     rcx, [rbp-140]
+        mov     rdx, QWORD PTR [rbp-16]
+        add     rdx, rcx
+        mov     BYTE PTR [rdx], al
+        add     QWORD PTR [rbp-16], 1
+.L192:
+        cmp     QWORD PTR [rbp-16], 98
+        ja      .L193
+        lea     rdx, [rbp-140]
+        mov     rax, QWORD PTR [rbp-16]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        test    al, al
+        jne     .L194
+.L193:
+        lea     rdx, [rbp-140]
+        mov     rax, QWORD PTR [rbp-16]
+        add     rax, rdx
+        mov     BYTE PTR [rax], 0
+        movzx   eax, BYTE PTR [rbp-140]
+        cmp     al, 41
+        je      .L195
+        mov     edi, OFFSET FLAT:.LC29
+        call    puts
+        mov     edi, 1
+        call    exit
+.L195:
+        mov     BYTE PTR check_2[rip], 1
+        mov     rdx, QWORD PTR [rbp-176]
+        mov     rax, QWORD PTR [rbp-168]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    parse_keys(char const*, int*)
+        nop
+        leave
+        ret
+inc:
+        .zero   1
+.LC30:
+        .string "Error sem\357\277\275ntico: Se esperaba un identificador.\n"
+.LC31:
+        .string "Error sem\357\277\275ntico: La variable '%s' no est\357\277\275 declarada.\n"
+.LC32:
+        .string "Error de sintaxis: se esperaba '='."
+incremento(char const*, int*):
+        push    rbp
+        mov     rbp, rsp
+        sub     rsp, 272
+        mov     QWORD PTR [rbp-152], rdi
+        mov     QWORD PTR [rbp-160], rsi
+        lea     rax, [rbp-112]
+        mov     rdx, QWORD PTR [rbp-160]
+        mov     rcx, QWORD PTR [rbp-152]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        mov     eax, DWORD PTR [rbp-112]
+        cmp     eax, 1
+        je      .L197
+        lea     rax, [rbp-112]
+        add     rax, 4
+        mov     rsi, rax
+        mov     edi, OFFSET FLAT:.LC30
+        mov     eax, 0
+        call    printf
+        mov     edi, 1
+        call    exit
+.L197:
+        lea     rax, [rbp-112]
+        add     rax, 4
+        mov     rdi, rax
+        call    find_symbol(char const*)
+        test    rax, rax
+        sete    al
+        test    al, al
+        je      .L198
+        lea     rax, [rbp-112]
+        add     rax, 4
+        mov     rsi, rax
+        mov     edi, OFFSET FLAT:.LC31
+        mov     eax, 0
+        call    printf
+        mov     edi, 1
+        call    exit
+.L198:
+        mov     DWORD PTR [rbp-4], 0
+        jmp     .L199
+.L200:
+        mov     eax, DWORD PTR [rbp-4]
+        cdqe
+        movzx   edx, BYTE PTR [rbp-108+rax]
+        mov     eax, DWORD PTR [rbp-4]
+        cdqe
+        mov     BYTE PTR [rbp-144+rax], dl
+        add     DWORD PTR [rbp-4], 1
+.L199:
+        mov     eax, DWORD PTR [rbp-4]
+        cdqe
+        movzx   eax, BYTE PTR [rbp-108+rax]
+        test    al, al
+        jne     .L200
+        mov     eax, DWORD PTR [rbp-4]
+        cdqe
+        mov     BYTE PTR [rbp-144+rax], 0
+        lea     rax, [rbp-272]
+        mov     rdx, QWORD PTR [rbp-160]
+        mov     rcx, QWORD PTR [rbp-152]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        mov     rax, QWORD PTR [rbp-272]
+        mov     rdx, QWORD PTR [rbp-264]
+        mov     QWORD PTR [rbp-112], rax
+        mov     QWORD PTR [rbp-104], rdx
+        mov     rax, QWORD PTR [rbp-256]
+        mov     rdx, QWORD PTR [rbp-248]
+        mov     QWORD PTR [rbp-96], rax
+        mov     QWORD PTR [rbp-88], rdx
+        mov     rax, QWORD PTR [rbp-240]
+        mov     rdx, QWORD PTR [rbp-232]
+        mov     QWORD PTR [rbp-80], rax
+        mov     QWORD PTR [rbp-72], rdx
+        mov     rax, QWORD PTR [rbp-224]
+        mov     rdx, QWORD PTR [rbp-216]
+        mov     QWORD PTR [rbp-64], rax
+        mov     QWORD PTR [rbp-56], rdx
+        mov     rax, QWORD PTR [rbp-208]
+        mov     rdx, QWORD PTR [rbp-200]
+        mov     QWORD PTR [rbp-48], rax
+        mov     QWORD PTR [rbp-40], rdx
+        mov     rax, QWORD PTR [rbp-192]
+        mov     rdx, QWORD PTR [rbp-184]
+        mov     QWORD PTR [rbp-32], rax
+        mov     QWORD PTR [rbp-24], rdx
+        mov     rax, QWORD PTR [rbp-176]
+        mov     QWORD PTR [rbp-16], rax
+        movzx   eax, BYTE PTR [rbp-108]
+        cmp     al, 61
+        je      .L201
+        mov     edi, OFFSET FLAT:.LC32
+        call    puts
+.L201:
+        mov     rdx, QWORD PTR [rbp-160]
+        mov     rax, QWORD PTR [rbp-152]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    parse_expression(char const*, int*)
+        mov     DWORD PTR [rbp-8], eax
+        movzx   eax, BYTE PTR inc[rip]
+        test    al, al
+        je      .L203
+        mov     edx, DWORD PTR [rbp-8]
+        lea     rax, [rbp-144]
+        mov     esi, edx
+        mov     rdi, rax
+        call    add_value(char const*, int)
+.L203:
+        nop
+        leave
+        ret
+saul_expression(char const*, int*):
+        push    rbp
+        mov     rbp, rsp
+        sub     rsp, 304
+        mov     QWORD PTR [rbp-184], rdi
+        mov     QWORD PTR [rbp-192], rsi
+        lea     rax, [rbp-160]
+        mov     rdx, QWORD PTR [rbp-192]
+        mov     rcx, QWORD PTR [rbp-184]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        mov     BYTE PTR check_2[rip], 0
+        movzx   eax, BYTE PTR [rbp-156]
+        cmp     al, 40
+        je      .L205
+        mov     edi, OFFSET FLAT:.LC26
+        call    puts
+        mov     edi, 1
+        call    exit
+.L205:
+        lea     rax, [rbp-304]
+        mov     rdx, QWORD PTR [rbp-192]
+        mov     rcx, QWORD PTR [rbp-184]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        mov     rax, QWORD PTR [rbp-304]
+        mov     rdx, QWORD PTR [rbp-296]
+        mov     QWORD PTR [rbp-160], rax
+        mov     QWORD PTR [rbp-152], rdx
+        mov     rax, QWORD PTR [rbp-288]
+        mov     rdx, QWORD PTR [rbp-280]
+        mov     QWORD PTR [rbp-144], rax
+        mov     QWORD PTR [rbp-136], rdx
+        mov     rax, QWORD PTR [rbp-272]
+        mov     rdx, QWORD PTR [rbp-264]
+        mov     QWORD PTR [rbp-128], rax
+        mov     QWORD PTR [rbp-120], rdx
+        mov     rax, QWORD PTR [rbp-256]
+        mov     rdx, QWORD PTR [rbp-248]
+        mov     QWORD PTR [rbp-112], rax
+        mov     QWORD PTR [rbp-104], rdx
+        mov     rax, QWORD PTR [rbp-240]
+        mov     rdx, QWORD PTR [rbp-232]
+        mov     QWORD PTR [rbp-96], rax
+        mov     QWORD PTR [rbp-88], rdx
+        mov     rax, QWORD PTR [rbp-224]
+        mov     rdx, QWORD PTR [rbp-216]
+        mov     QWORD PTR [rbp-80], rax
+        mov     QWORD PTR [rbp-72], rdx
+        mov     rax, QWORD PTR [rbp-208]
+        mov     QWORD PTR [rbp-64], rax
+        lea     rax, [rbp-160]
+        add     rax, 4
+        mov     rdi, rax
+        call    find_symbol(char const*)
+        test    rax, rax
+        jne     .L206
+        mov     eax, DWORD PTR [rbp-160]
+        test    eax, eax
+        je      .L206
+        mov     eax, 1
+        jmp     .L207
+.L206:
+        mov     eax, 0
+.L207:
+        test    al, al
+        je      .L208
+        lea     rax, [rbp-160]
+        add     rax, 4
+        mov     rsi, rax
+        mov     edi, OFFSET FLAT:.LC31
+        mov     eax, 0
+        call    printf
+        mov     edi, 1
+        call    exit
+.L208:
+        mov     QWORD PTR [rbp-8], 0
+        jmp     .L209
+.L211:
+        lea     rdx, [rbp-156]
+        mov     rax, QWORD PTR [rbp-8]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        mov     rdx, QWORD PTR [rbp-8]
+        add     rdx, OFFSET FLAT:auxiliary
+        mov     BYTE PTR [rdx], al
+        add     QWORD PTR [rbp-8], 1
+.L209:
+        cmp     QWORD PTR [rbp-8], 98
+        ja      .L210
+        lea     rdx, [rbp-156]
+        mov     rax, QWORD PTR [rbp-8]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        test    al, al
+        jne     .L211
+.L210:
+        mov     rax, QWORD PTR [rbp-8]
+        add     rax, OFFSET FLAT:auxiliary
+        mov     BYTE PTR [rax], 0
+        mov     rdx, QWORD PTR [rbp-192]
+        mov     rax, QWORD PTR [rbp-184]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    parse_declaration(char const*, int*)
+        mov     rax, QWORD PTR [rbp-192]
+        mov     eax, DWORD PTR [rax]
+        mov     DWORD PTR [rbp-44], eax
+        mov     rdx, QWORD PTR [rbp-192]
+        mov     rax, QWORD PTR [rbp-184]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    parse_expression(char const*, int*)
+        mov     DWORD PTR [rbp-12], eax
+        mov     QWORD PTR [rbp-24], 0
+        jmp     .L212
+.L214:
+        mov     rax, QWORD PTR [rbp-24]
+        add     rax, OFFSET FLAT:auxiliary
+        movzx   eax, BYTE PTR [rax]
+        lea     rcx, [rbp-162]
+        mov     rdx, QWORD PTR [rbp-24]
+        add     rdx, rcx
+        mov     BYTE PTR [rdx], al
+        add     QWORD PTR [rbp-24], 1
+.L212:
+        cmp     QWORD PTR [rbp-24], 98
+        ja      .L213
+        lea     rdx, [rbp-156]
+        mov     rax, QWORD PTR [rbp-24]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        test    al, al
+        jne     .L214
+.L213:
+        lea     rdx, [rbp-156]
+        mov     rax, QWORD PTR [rbp-24]
+        add     rax, rdx
+        mov     BYTE PTR [rax], 0
+        movzx   eax, BYTE PTR [rbp-162]
+        movsx   eax, al
+        mov     esi, eax
+        mov     edi, OFFSET FLAT:.LC27
+        call    strchr
+        test    rax, rax
+        jne     .L215
+        mov     edi, OFFSET FLAT:.LC28
+        call    puts
+        mov     edi, 1
+        call    exit
+.L215:
+        mov     rdx, QWORD PTR [rbp-192]
+        mov     rax, QWORD PTR [rbp-184]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    parse_expression(char const*, int*)
+        mov     DWORD PTR [rbp-28], eax
+        mov     QWORD PTR [rbp-40], 0
+        jmp     .L216
+.L218:
+        mov     rax, QWORD PTR [rbp-40]
+        add     rax, OFFSET FLAT:auxiliary
+        movzx   eax, BYTE PTR [rax]
+        lea     rcx, [rbp-156]
+        mov     rdx, QWORD PTR [rbp-40]
+        add     rdx, rcx
+        mov     BYTE PTR [rdx], al
+        add     QWORD PTR [rbp-40], 1
+.L216:
+        cmp     QWORD PTR [rbp-40], 98
+        ja      .L217
+        lea     rdx, [rbp-156]
+        mov     rax, QWORD PTR [rbp-40]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        test    al, al
+        jne     .L218
+.L217:
+        lea     rdx, [rbp-156]
+        mov     rax, QWORD PTR [rbp-40]
+        add     rax, rdx
+        mov     BYTE PTR [rax], 0
+        movzx   eax, BYTE PTR [rbp-156]
+        cmp     al, 59
+        je      .L219
+        mov     edi, OFFSET FLAT:.LC24
+        call    puts
+        mov     edi, 1
+        call    exit
+.L219:
+        mov     rax, QWORD PTR [rbp-192]
+        mov     eax, DWORD PTR [rax]
+        mov     DWORD PTR [rbp-48], eax
+        mov     BYTE PTR inc[rip], 0
+        mov     rdx, QWORD PTR [rbp-192]
+        mov     rax, QWORD PTR [rbp-184]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    incremento(char const*, int*)
+        mov     QWORD PTR [rbp-24], 0
+        jmp     .L220
+.L222:
+        mov     rax, QWORD PTR [rbp-24]
+        add     rax, OFFSET FLAT:auxiliary
+        movzx   eax, BYTE PTR [rax]
+        lea     rcx, [rbp-156]
+        mov     rdx, QWORD PTR [rbp-24]
+        add     rdx, rcx
+        mov     BYTE PTR [rdx], al
+        add     QWORD PTR [rbp-24], 1
+.L220:
+        cmp     QWORD PTR [rbp-24], 98
+        ja      .L221
+        lea     rdx, [rbp-156]
+        mov     rax, QWORD PTR [rbp-24]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        test    al, al
+        jne     .L222
+.L221:
+        lea     rdx, [rbp-156]
+        mov     rax, QWORD PTR [rbp-24]
+        add     rax, rdx
+        mov     BYTE PTR [rax], 0
+        movzx   eax, BYTE PTR [rbp-156]
+        cmp     al, 41
+        je      .L223
+        mov     edi, OFFSET FLAT:.LC29
+        call    puts
+        mov     edi, 1
+        call    exit
+.L223:
+        mov     BYTE PTR check_2[rip], 1
+        mov     BYTE PTR inc[rip], 1
+        mov     rax, QWORD PTR [rbp-192]
+        mov     eax, DWORD PTR [rax]
+        mov     DWORD PTR [rbp-52], eax
+        jmp     .L224
+.L225:
+        mov     rax, QWORD PTR [rbp-192]
+        mov     edx, DWORD PTR [rbp-48]
+        mov     DWORD PTR [rax], edx
+        mov     rdx, QWORD PTR [rbp-192]
+        mov     rax, QWORD PTR [rbp-184]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    incremento(char const*, int*)
+        mov     rax, QWORD PTR [rbp-192]
+        mov     edx, DWORD PTR [rbp-44]
+        mov     DWORD PTR [rax], edx
+        mov     BYTE PTR check_2[rip], 0
+        mov     rdx, QWORD PTR [rbp-192]
+        mov     rax, QWORD PTR [rbp-184]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    parse_expression(char const*, int*)
+        mov     DWORD PTR [rbp-12], eax
+        mov     rdx, QWORD PTR [rbp-192]
+        mov     rax, QWORD PTR [rbp-184]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    parse_expression(char const*, int*)
+        mov     DWORD PTR [rbp-28], eax
+        mov     BYTE PTR check_2[rip], 1
+        mov     rax, QWORD PTR [rbp-192]
+        mov     edx, DWORD PTR [rbp-52]
+        mov     DWORD PTR [rax], edx
+        mov     rdx, QWORD PTR [rbp-192]
+        mov     rax, QWORD PTR [rbp-184]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    parse_keys(char const*, int*)
+.L224:
+        movzx   eax, BYTE PTR [rbp-162]
+        movsx   edx, al
+        mov     ecx, DWORD PTR [rbp-28]
+        mov     eax, DWORD PTR [rbp-12]
+        mov     esi, ecx
+        mov     edi, eax
+        call    if_solve(int, int, char)
+        test    al, al
+        jne     .L225
+        nop
+        nop
+        leave
+        ret
+imp_expr(Token, char const*, int*, int*):
+        push    rbp
+        mov     rbp, rsp
+        sub     rsp, 272
+        mov     QWORD PTR [rbp-136], rdi
+        mov     QWORD PTR [rbp-144], rsi
+        mov     QWORD PTR [rbp-152], rdx
+        mov     rax, QWORD PTR [rbp-144]
+        mov     eax, DWORD PTR [rax]
+        mov     DWORD PTR [rbp-4], eax
+        mov     rax, QWORD PTR [rbp+16]
+        mov     rdx, QWORD PTR [rbp+24]
+        mov     QWORD PTR [rbp-128], rax
+        mov     QWORD PTR [rbp-120], rdx
+        mov     rax, QWORD PTR [rbp+32]
+        mov     rdx, QWORD PTR [rbp+40]
+        mov     QWORD PTR [rbp-112], rax
+        mov     QWORD PTR [rbp-104], rdx
+        mov     rax, QWORD PTR [rbp+48]
+        mov     rdx, QWORD PTR [rbp+56]
+        mov     QWORD PTR [rbp-96], rax
+        mov     QWORD PTR [rbp-88], rdx
+        mov     rax, QWORD PTR [rbp+64]
+        mov     rdx, QWORD PTR [rbp+72]
+        mov     QWORD PTR [rbp-80], rax
+        mov     QWORD PTR [rbp-72], rdx
+        mov     rax, QWORD PTR [rbp+80]
+        mov     rdx, QWORD PTR [rbp+88]
+        mov     QWORD PTR [rbp-64], rax
+        mov     QWORD PTR [rbp-56], rdx
+        mov     rax, QWORD PTR [rbp+96]
+        mov     rdx, QWORD PTR [rbp+104]
+        mov     QWORD PTR [rbp-48], rax
+        mov     QWORD PTR [rbp-40], rdx
+        mov     rax, QWORD PTR [rbp+112]
+        mov     QWORD PTR [rbp-32], rax
+        lea     rax, [rbp-272]
+        mov     rdx, QWORD PTR [rbp-144]
+        mov     rcx, QWORD PTR [rbp-136]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        mov     rax, QWORD PTR [rbp-272]
+        mov     rdx, QWORD PTR [rbp-264]
+        mov     QWORD PTR [rbp+16], rax
+        mov     QWORD PTR [rbp+24], rdx
+        mov     rax, QWORD PTR [rbp-256]
+        mov     rdx, QWORD PTR [rbp-248]
+        mov     QWORD PTR [rbp+32], rax
+        mov     QWORD PTR [rbp+40], rdx
+        mov     rax, QWORD PTR [rbp-240]
+        mov     rdx, QWORD PTR [rbp-232]
+        mov     QWORD PTR [rbp+48], rax
+        mov     QWORD PTR [rbp+56], rdx
+        mov     rax, QWORD PTR [rbp-224]
+        mov     rdx, QWORD PTR [rbp-216]
+        mov     QWORD PTR [rbp+64], rax
+        mov     QWORD PTR [rbp+72], rdx
+        mov     rax, QWORD PTR [rbp-208]
+        mov     rdx, QWORD PTR [rbp-200]
+        mov     QWORD PTR [rbp+80], rax
+        mov     QWORD PTR [rbp+88], rdx
+        mov     rax, QWORD PTR [rbp-192]
+        mov     rdx, QWORD PTR [rbp-184]
+        mov     QWORD PTR [rbp+96], rax
+        mov     QWORD PTR [rbp+104], rdx
+        mov     rax, QWORD PTR [rbp-176]
+        mov     QWORD PTR [rbp+112], rax
+        mov     rax, QWORD PTR [rbp-144]
+        mov     edx, DWORD PTR [rbp-4]
+        mov     DWORD PTR [rax], edx
+        movzx   eax, BYTE PTR [rbp-124]
+        cmp     al, 41
+        jne     .L227
+        movzx   eax, BYTE PTR [rbp+20]
+        cmp     al, 34
+        je      .L228
+.L227:
+        mov     eax, DWORD PTR [rbp+16]
+        cmp     eax, 3
+        je      .L228
+        mov     eax, DWORD PTR [rbp-128]
+        cmp     eax, 2
+        jne     .L229
+        lea     rax, [rbp-128]
+        add     rax, 4
+        mov     rdi, rax
+        call    atoi
+        jmp     .L232
+.L229:
+        lea     rax, [rbp-128]
+        add     rax, 4
+        mov     rdi, rax
+        call    find_symbol(char const*)
+        mov     QWORD PTR [rbp-16], rax
+        cmp     QWORD PTR [rbp-16], 0
+        je      .L231
+        mov     rax, QWORD PTR [rbp-16]
+        mov     eax, DWORD PTR [rax+104]
+        jmp     .L232
+.L231:
+        lea     rax, [rbp+20]
+        mov     rsi, rax
+        mov     edi, OFFSET FLAT:.LC31
+        mov     eax, 0
+        call    printf
+        mov     edi, 1
+        call    exit
+.L228:
+        mov     rdx, QWORD PTR [rbp-152]
+        mov     rax, QWORD PTR [rbp-136]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    parse_expression(char const*, int*)
+        mov     DWORD PTR [rbp-20], eax
+        mov     edx, DWORD PTR print[rip]
+        mov     rax, QWORD PTR [rbp-144]
+        mov     DWORD PTR [rax], edx
+        mov     eax, DWORD PTR [rbp-20]
+.L232:
+        leave
+        ret
+.LC33:
+        .string "Error de sintaxis: se esperaba ')'."
+.LC34:
+        .string "Error de sintaxis: Palabra reservada."
+.LC35:
+        .string " "
+.LC36:
+        .string "Error de sintaxis: se esperaba '\"'."
+parse_print(char const*, int*):
+        push    rbp
+        mov     rbp, rsp
+        push    rbx
+        sub     rsp, 472
+        mov     QWORD PTR [rbp-360], rdi
+        mov     QWORD PTR [rbp-368], rsi
+        lea     rax, [rbp-304]
+        mov     rdx, QWORD PTR [rbp-368]
+        mov     rcx, QWORD PTR [rbp-360]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        lea     rax, [rbp-336]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string() [complete object constructor]
+        movzx   eax, BYTE PTR [rbp-300]
+        cmp     al, 40
+        je      .L234
+        mov     edi, OFFSET FLAT:.LC26
+        call    puts
+        mov     edi, 1
+        call    exit
+.L234:
+        mov     rax, QWORD PTR [rbp-368]
+        mov     eax, DWORD PTR [rax]
+        mov     DWORD PTR [rbp-340], eax
+        jmp     .L235
+.L241:
+        lea     rax, [rbp-480]
+        mov     rdx, QWORD PTR [rbp-368]
+        mov     rcx, QWORD PTR [rbp-360]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        mov     rax, QWORD PTR [rbp-480]
+        mov     rdx, QWORD PTR [rbp-472]
+        mov     QWORD PTR [rbp-304], rax
+        mov     QWORD PTR [rbp-296], rdx
+        mov     rax, QWORD PTR [rbp-464]
+        mov     rdx, QWORD PTR [rbp-456]
+        mov     QWORD PTR [rbp-288], rax
+        mov     QWORD PTR [rbp-280], rdx
+        mov     rax, QWORD PTR [rbp-448]
+        mov     rdx, QWORD PTR [rbp-440]
+        mov     QWORD PTR [rbp-272], rax
+        mov     QWORD PTR [rbp-264], rdx
+        mov     rax, QWORD PTR [rbp-432]
+        mov     rdx, QWORD PTR [rbp-424]
+        mov     QWORD PTR [rbp-256], rax
+        mov     QWORD PTR [rbp-248], rdx
+        mov     rax, QWORD PTR [rbp-416]
+        mov     rdx, QWORD PTR [rbp-408]
+        mov     QWORD PTR [rbp-240], rax
+        mov     QWORD PTR [rbp-232], rdx
+        mov     rax, QWORD PTR [rbp-400]
+        mov     rdx, QWORD PTR [rbp-392]
+        mov     QWORD PTR [rbp-224], rax
+        mov     QWORD PTR [rbp-216], rdx
+        mov     rax, QWORD PTR [rbp-384]
+        mov     QWORD PTR [rbp-208], rax
+        movzx   eax, BYTE PTR [rbp-300]
+        test    al, al
+        jne     .L236
+        mov     edi, OFFSET FLAT:.LC33
+        call    puts
+        mov     edi, 1
+        call    exit
+.L236:
+        mov     eax, DWORD PTR [rbp-304]
+        test    eax, eax
+        jne     .L237
+        mov     edi, OFFSET FLAT:.LC34
+        call    puts
+        mov     edi, 1
+        call    exit
+.L237:
+        movzx   eax, BYTE PTR [rbp-300]
+        cmp     al, 34
+        jne     .L238
+        lea     rax, [rbp-480]
+        mov     rdx, QWORD PTR [rbp-368]
+        mov     rcx, QWORD PTR [rbp-360]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        mov     rax, QWORD PTR [rbp-480]
+        mov     rdx, QWORD PTR [rbp-472]
+        mov     QWORD PTR [rbp-304], rax
+        mov     QWORD PTR [rbp-296], rdx
+        mov     rax, QWORD PTR [rbp-464]
+        mov     rdx, QWORD PTR [rbp-456]
+        mov     QWORD PTR [rbp-288], rax
+        mov     QWORD PTR [rbp-280], rdx
+        mov     rax, QWORD PTR [rbp-448]
+        mov     rdx, QWORD PTR [rbp-440]
+        mov     QWORD PTR [rbp-272], rax
+        mov     QWORD PTR [rbp-264], rdx
+        mov     rax, QWORD PTR [rbp-432]
+        mov     rdx, QWORD PTR [rbp-424]
+        mov     QWORD PTR [rbp-256], rax
+        mov     QWORD PTR [rbp-248], rdx
+        mov     rax, QWORD PTR [rbp-416]
+        mov     rdx, QWORD PTR [rbp-408]
+        mov     QWORD PTR [rbp-240], rax
+        mov     QWORD PTR [rbp-232], rdx
+        mov     rax, QWORD PTR [rbp-400]
+        mov     rdx, QWORD PTR [rbp-392]
+        mov     QWORD PTR [rbp-224], rax
+        mov     QWORD PTR [rbp-216], rdx
+        mov     rax, QWORD PTR [rbp-384]
+        mov     QWORD PTR [rbp-208], rax
+        jmp     .L239
+.L240:
+        lea     rax, [rbp-160]
+        lea     rdx, [rbp-304]
+        add     rdx, 4
+        lea     rcx, [rbp-336]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char const*)
+        lea     rax, [rbp-192]
+        lea     rcx, [rbp-160]
+        mov     edx, OFFSET FLAT:.LC35
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&, char const*)
+        lea     rdx, [rbp-192]
+        lea     rax, [rbp-336]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator=(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&)
+        lea     rax, [rbp-192]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        lea     rax, [rbp-160]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        lea     rax, [rbp-480]
+        mov     rdx, QWORD PTR [rbp-368]
+        mov     rcx, QWORD PTR [rbp-360]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        mov     rax, QWORD PTR [rbp-480]
+        mov     rdx, QWORD PTR [rbp-472]
+        mov     QWORD PTR [rbp-304], rax
+        mov     QWORD PTR [rbp-296], rdx
+        mov     rax, QWORD PTR [rbp-464]
+        mov     rdx, QWORD PTR [rbp-456]
+        mov     QWORD PTR [rbp-288], rax
+        mov     QWORD PTR [rbp-280], rdx
+        mov     rax, QWORD PTR [rbp-448]
+        mov     rdx, QWORD PTR [rbp-440]
+        mov     QWORD PTR [rbp-272], rax
+        mov     QWORD PTR [rbp-264], rdx
+        mov     rax, QWORD PTR [rbp-432]
+        mov     rdx, QWORD PTR [rbp-424]
+        mov     QWORD PTR [rbp-256], rax
+        mov     QWORD PTR [rbp-248], rdx
+        mov     rax, QWORD PTR [rbp-416]
+        mov     rdx, QWORD PTR [rbp-408]
+        mov     QWORD PTR [rbp-240], rax
+        mov     QWORD PTR [rbp-232], rdx
+        mov     rax, QWORD PTR [rbp-400]
+        mov     rdx, QWORD PTR [rbp-392]
+        mov     QWORD PTR [rbp-224], rax
+        mov     QWORD PTR [rbp-216], rdx
+        mov     rax, QWORD PTR [rbp-384]
+        mov     QWORD PTR [rbp-208], rax
+        movzx   eax, BYTE PTR [rbp-300]
+        test    al, al
+        jne     .L239
+        mov     edi, OFFSET FLAT:.LC36
+        call    puts
+        mov     edi, 1
+        call    exit
+.L239:
+        movzx   eax, BYTE PTR [rbp-300]
+        cmp     al, 34
+        jne     .L240
+        mov     rax, QWORD PTR [rbp-368]
+        mov     eax, DWORD PTR [rax]
+        mov     DWORD PTR [rbp-340], eax
+        jmp     .L235
+.L238:
+        movzx   eax, BYTE PTR [rbp-300]
+        cmp     al, 41
+        je      .L235
+        lea     rdx, [rbp-340]
+        mov     rsi, QWORD PTR [rbp-368]
+        mov     rdi, QWORD PTR [rbp-360]
+        sub     rsp, 8
+        sub     rsp, 104
+        mov     rax, rsp
+        mov     rcx, QWORD PTR [rbp-304]
+        mov     rbx, QWORD PTR [rbp-296]
+        mov     QWORD PTR [rax], rcx
+        mov     QWORD PTR [rax+8], rbx
+        mov     rcx, QWORD PTR [rbp-288]
+        mov     rbx, QWORD PTR [rbp-280]
+        mov     QWORD PTR [rax+16], rcx
+        mov     QWORD PTR [rax+24], rbx
+        mov     rcx, QWORD PTR [rbp-272]
+        mov     rbx, QWORD PTR [rbp-264]
+        mov     QWORD PTR [rax+32], rcx
+        mov     QWORD PTR [rax+40], rbx
+        mov     rcx, QWORD PTR [rbp-256]
+        mov     rbx, QWORD PTR [rbp-248]
+        mov     QWORD PTR [rax+48], rcx
+        mov     QWORD PTR [rax+56], rbx
+        mov     rcx, QWORD PTR [rbp-240]
+        mov     rbx, QWORD PTR [rbp-232]
+        mov     QWORD PTR [rax+64], rcx
+        mov     QWORD PTR [rax+72], rbx
+        mov     rcx, QWORD PTR [rbp-224]
+        mov     rbx, QWORD PTR [rbp-216]
+        mov     QWORD PTR [rax+80], rcx
+        mov     QWORD PTR [rax+88], rbx
+        mov     rcx, QWORD PTR [rbp-208]
+        mov     QWORD PTR [rax+96], rcx
+        call    imp_expr(Token, char const*, int*, int*)
+        add     rsp, 112
+        mov     DWORD PTR [rbp-20], eax
+        lea     rax, [rbp-64]
+        mov     edx, DWORD PTR [rbp-20]
+        mov     esi, edx
+        mov     rdi, rax
+        call    std::__cxx11::to_string(int)
+        lea     rax, [rbp-96]
+        lea     rdx, [rbp-64]
+        lea     rcx, [rbp-336]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&)
+        lea     rax, [rbp-128]
+        lea     rcx, [rbp-96]
+        mov     edx, OFFSET FLAT:.LC35
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&, char const*)
+        lea     rdx, [rbp-128]
+        lea     rax, [rbp-336]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator=(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&)
+        lea     rax, [rbp-128]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        lea     rax, [rbp-96]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        lea     rax, [rbp-64]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+.L235:
+        movzx   eax, BYTE PTR [rbp-300]
+        cmp     al, 41
+        jne     .L241
+        lea     rax, [rbp-336]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::c_str() const
+        mov     rdi, rax
+        mov     eax, 0
+        call    printf
+        lea     rax, [rbp-336]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        jmp     .L250
+        mov     rbx, rax
+        lea     rax, [rbp-160]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        jmp     .L243
+        mov     rbx, rax
+        lea     rax, [rbp-96]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        jmp     .L245
+        mov     rbx, rax
+.L245:
+        lea     rax, [rbp-64]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        jmp     .L243
+        mov     rbx, rax
+.L243:
+        lea     rax, [rbp-336]
+        mov     rdi, rax
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        mov     rax, rbx
+        mov     rdi, rax
+        call    _Unwind_Resume
+.L250:
+        mov     rbx, QWORD PTR [rbp-8]
+        leave
+        ret
+.LC37:
+        .string "Error de sintaxis: Se esperaba ';' despu\303\251s del valor de retorno."
+rhaeshisar(char const*, int*):
+        push    rbp
+        mov     rbp, rsp
+        sub     rsp, 240
+        mov     QWORD PTR [rbp-120], rdi
+        mov     QWORD PTR [rbp-128], rsi
+        lea     rax, [rbp-112]
+        mov     rdx, QWORD PTR [rbp-128]
+        mov     rcx, QWORD PTR [rbp-120]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        movzx   eax, BYTE PTR [rbp-108]
+        cmp     al, 59
+        je      .L252
+        mov     rdx, QWORD PTR [rbp-128]
+        mov     rax, QWORD PTR [rbp-120]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    parse_expression(char const*, int*)
+        mov     DWORD PTR [rbp-4], eax
+        lea     rax, [rbp-240]
+        mov     rdx, QWORD PTR [rbp-128]
+        mov     rcx, QWORD PTR [rbp-120]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        mov     rax, QWORD PTR [rbp-240]
+        mov     rdx, QWORD PTR [rbp-232]
+        mov     QWORD PTR [rbp-112], rax
+        mov     QWORD PTR [rbp-104], rdx
+        mov     rax, QWORD PTR [rbp-224]
+        mov     rdx, QWORD PTR [rbp-216]
+        mov     QWORD PTR [rbp-96], rax
+        mov     QWORD PTR [rbp-88], rdx
+        mov     rax, QWORD PTR [rbp-208]
+        mov     rdx, QWORD PTR [rbp-200]
+        mov     QWORD PTR [rbp-80], rax
+        mov     QWORD PTR [rbp-72], rdx
+        mov     rax, QWORD PTR [rbp-192]
+        mov     rdx, QWORD PTR [rbp-184]
+        mov     QWORD PTR [rbp-64], rax
+        mov     QWORD PTR [rbp-56], rdx
+        mov     rax, QWORD PTR [rbp-176]
+        mov     rdx, QWORD PTR [rbp-168]
+        mov     QWORD PTR [rbp-48], rax
+        mov     QWORD PTR [rbp-40], rdx
+        mov     rax, QWORD PTR [rbp-160]
+        mov     rdx, QWORD PTR [rbp-152]
+        mov     QWORD PTR [rbp-32], rax
+        mov     QWORD PTR [rbp-24], rdx
+        mov     rax, QWORD PTR [rbp-144]
+        mov     QWORD PTR [rbp-16], rax
+        movzx   eax, BYTE PTR [rbp-108]
+        cmp     al, 59
+        je      .L253
+        mov     edi, OFFSET FLAT:.LC37
+        call    puts
+        mov     edi, 1
+        call    exit
+.L253:
+        mov     eax, DWORD PTR [rbp-4]
+        jmp     .L255
+.L252:
+        mov     eax, 0
+.L255:
+        leave
+        ret
+.LC38:
+        .string "Error de sintaxis: Token inesperado '%s'.\n"
+parse_statement(char const*, int*):
+        push    rbp
+        mov     rbp, rsp
+        add     rsp, -128
+        mov     QWORD PTR [rbp-120], rdi
+        mov     QWORD PTR [rbp-128], rsi
+        lea     rax, [rbp-112]
+        mov     rdx, QWORD PTR [rbp-128]
+        mov     rcx, QWORD PTR [rbp-120]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    get_next_token(char const*, int*)
+        mov     eax, DWORD PTR [rbp-112]
+        test    eax, eax
+        jne     .L257
+        lea     rax, [rbp-112]
+        add     rax, 4
+        mov     esi, OFFSET FLAT:.LC4
+        mov     rdi, rax
+        call    strcmp
+        test    eax, eax
+        je      .L258
+        lea     rax, [rbp-112]
+        add     rax, 4
+        mov     esi, OFFSET FLAT:.LC5
+        mov     rdi, rax
+        call    strcmp
+        test    eax, eax
+        jne     .L259
+.L258:
+        mov     rdx, QWORD PTR [rbp-128]
+        mov     rax, QWORD PTR [rbp-120]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    parse_declaration(char const*, int*)
+        jmp     .L266
+.L259:
+        lea     rax, [rbp-112]
+        add     rax, 4
+        mov     esi, OFFSET FLAT:.LC0
+        mov     rdi, rax
+        call    strcmp
+        test    eax, eax
+        jne     .L261
+        mov     rdx, QWORD PTR [rbp-128]
+        mov     rax, QWORD PTR [rbp-120]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    parse_if_statement(char const*, int*)
+        jmp     .L266
+.L261:
+        lea     rax, [rbp-112]
+        add     rax, 4
+        mov     esi, OFFSET FLAT:.LC3
+        mov     rdi, rax
+        call    strcmp
+        test    eax, eax
+        jne     .L262
+        mov     rdx, QWORD PTR [rbp-128]
+        mov     rax, QWORD PTR [rbp-120]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    parse_expression(char const*, int*)
+        mov     rdx, QWORD PTR [rbp-128]
+        mov     rax, QWORD PTR [rbp-120]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    rhaeshisar(char const*, int*)
+        mov     DWORD PTR [rbp-4], eax
+        jmp     .L266
+.L262:
+        lea     rax, [rbp-112]
+        add     rax, 4
+        mov     esi, OFFSET FLAT:.LC6
+        mov     rdi, rax
+        call    strcmp
+        test    eax, eax
+        jne     .L263
+        mov     rdx, QWORD PTR [rbp-128]
+        mov     rax, QWORD PTR [rbp-120]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    saul_expression(char const*, int*)
+        jmp     .L266
+.L263:
+        lea     rax, [rbp-112]
+        add     rax, 4
+        mov     esi, OFFSET FLAT:.LC8
+        mov     rdi, rax
+        call    strcmp
+        test    eax, eax
+        jne     .L266
+        mov     rdx, QWORD PTR [rbp-128]
+        mov     rax, QWORD PTR [rbp-120]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    parse_print(char const*, int*)
+        jmp     .L266
+.L257:
+        lea     rax, [rbp-112]
+        add     rax, 4
+        mov     rdi, rax
+        call    find_symbol(char const*)
+        test    rax, rax
+        setne   al
+        test    al, al
+        je      .L265
+        lea     rax, [rbp-112]
+        add     rax, 4
+        mov     rsi, rax
+        mov     edi, OFFSET FLAT:temporal[abi:cxx11]
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator=(char const*)
+        mov     rdx, QWORD PTR [rbp-128]
+        mov     rax, QWORD PTR [rbp-120]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    parse_identifier(char const*, int*)
+        jmp     .L266
+.L265:
+        movzx   eax, BYTE PTR [rbp-108]
+        test    al, al
+        je      .L266
+        lea     rax, [rbp-112]
+        add     rax, 4
+        mov     rsi, rax
+        mov     edi, OFFSET FLAT:.LC38
+        mov     eax, 0
+        call    printf
+.L266:
+        nop
+        leave
+        ret
+parse_program(char const*, int*):
+        push    rbp
+        mov     rbp, rsp
+        sub     rsp, 16
+        mov     QWORD PTR [rbp-8], rdi
+        mov     QWORD PTR [rbp-16], rsi
+        jmp     .L268
+.L269:
+        mov     rdx, QWORD PTR [rbp-16]
+        mov     rax, QWORD PTR [rbp-8]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    parse_statement(char const*, int*)
+.L268:
+        mov     rax, QWORD PTR [rbp-16]
+        mov     eax, DWORD PTR [rax]
+        movsx   rdx, eax
+        mov     rax, QWORD PTR [rbp-8]
+        add     rax, rdx
+        movzx   eax, BYTE PTR [rax]
+        test    al, al
+        jne     .L269
+        nop
+        nop
+        leave
+        ret
+.LC39:
+        .string "Introduce el codigo fuente (deja una linea vacia para finalizar):"
+.LC40:
+        .string "Error al leer la entrada."
+.LC41:
+        .string "\n"
+.LC42:
+        .string "\nCodigo fuente ingresado:\n%s\n"
+.LC43:
+        .string "\nAnalisis:"
+main:
+        push    rbp
+        mov     rbp, rsp
+        sub     rsp, 9248
+        lea     rdx, [rbp-9232]
+        mov     eax, 0
+        mov     ecx, 1024
+        mov     rdi, rdx
+        rep stosq
+        mov     DWORD PTR [rbp-9236], 0
+        mov     edi, OFFSET FLAT:.LC39
+        call    puts
+.L276:
+        mov     rdx, QWORD PTR stdin[rip]
+        lea     rax, [rbp-1040]
+        mov     esi, 1024
+        mov     rdi, rax
+        call    fgets
+        test    rax, rax
+        sete    al
+        test    al, al
+        je      .L271
+        mov     edi, OFFSET FLAT:.LC40
+        call    puts
+        mov     eax, 1
+        jmp     .L277
+.L271:
+        lea     rax, [rbp-1040]
+        mov     rdi, rax
+        call    strlen
+        mov     QWORD PTR [rbp-8], rax
+        cmp     QWORD PTR [rbp-8], 0
+        je      .L273
+        mov     rax, QWORD PTR [rbp-8]
+        sub     rax, 1
+        movzx   eax, BYTE PTR [rbp-1040+rax]
+        cmp     al, 10
+        jne     .L273
+        mov     rax, QWORD PTR [rbp-8]
+        sub     rax, 1
+        mov     BYTE PTR [rbp-1040+rax], 0
+.L273:
+        lea     rax, [rbp-1040]
+        movzx   eax, BYTE PTR [rax]
+        test    al, al
+        je      .L279
+        lea     rax, [rbp-9232]
+        mov     rdi, rax
+        call    strlen
+        mov     edx, 8191
+        sub     rdx, rax
+        lea     rcx, [rbp-1040]
+        lea     rax, [rbp-9232]
+        mov     rsi, rcx
+        mov     rdi, rax
+        call    strncat
+        lea     rax, [rbp-9232]
+        mov     rdi, rax
+        call    strlen
+        mov     edx, 8191
+        sub     rdx, rax
+        lea     rax, [rbp-9232]
+        mov     esi, OFFSET FLAT:.LC41
+        mov     rdi, rax
+        call    strncat
+        jmp     .L276
+.L279:
+        nop
+        lea     rax, [rbp-9232]
+        mov     rsi, rax
+        mov     edi, OFFSET FLAT:.LC42
+        mov     eax, 0
+        call    printf
+        mov     edi, OFFSET FLAT:.LC43
+        call    puts
+        lea     rdx, [rbp-9236]
+        lea     rax, [rbp-9232]
+        mov     rsi, rdx
+        mov     rdi, rax
+        call    parse_program(char const*, int*)
+        mov     eax, 0
+.L277:
+        leave
+        ret
+__static_initialization_and_destruction_0():
+        push    rbp
+        mov     rbp, rsp
+        mov     edi, OFFSET FLAT:temporal[abi:cxx11]
+        call    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string() [complete object constructor]
+        mov     edx, OFFSET FLAT:__dso_handle
+        mov     esi, OFFSET FLAT:temporal[abi:cxx11]
+        mov     edi, OFFSET FLAT:std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() [complete object destructor]
+        call    __cxa_atexit
+        nop
+        pop     rbp
+        ret
+_GLOBAL__sub_I_auxiliary:
+        push    rbp
+        mov     rbp, rsp
+        call    __static_initialization_and_destruction_0()
+        pop     rbp
+        ret
